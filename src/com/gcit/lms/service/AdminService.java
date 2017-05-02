@@ -6,11 +6,15 @@ import java.util.List;
 
 import com.gcit.lms.dao.AuthorDAO;
 import com.gcit.lms.dao.BookDAO;
+import com.gcit.lms.dao.BorrowerDAO;
 import com.gcit.lms.dao.GenreDAO;
+import com.gcit.lms.dao.LibraryBranchDAO;
 import com.gcit.lms.dao.PublisherDAO;
 import com.gcit.lms.entity.Author;
 import com.gcit.lms.entity.Book;
+import com.gcit.lms.entity.Borrower;
 import com.gcit.lms.entity.Genre;
+import com.gcit.lms.entity.LibraryBranch;
 import com.gcit.lms.entity.Publisher;
 
 public class AdminService {
@@ -133,6 +137,108 @@ public class AdminService {
 		}
 	}
 	
+	public void addPublisher(Publisher publisher) throws SQLException{
+		Connection conn = null;
+		try {
+			conn = ConnectionUtil.getConnection();
+			PublisherDAO gdao = new PublisherDAO(conn);
+			gdao.addPublisher(publisher);
+			conn.commit();
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			conn.rollback();
+		} finally{
+			if(conn!=null){
+				conn.close();
+			}
+		}
+	}
+	
+	public void editPublisher(Publisher publisher) throws SQLException{
+		Connection conn = null;
+		try {
+			conn = ConnectionUtil.getConnection();
+			PublisherDAO gdao = new PublisherDAO(conn);
+			gdao.updatePublisher(publisher);
+			conn.commit();
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			conn.rollback();
+		} finally{
+			if(conn!=null){
+				conn.close();
+			}
+		}
+	}
+	
+	public void addBorrower(Borrower borrower) throws SQLException{
+		Connection conn = null;
+		try {
+			conn = ConnectionUtil.getConnection();
+			BorrowerDAO brdao = new BorrowerDAO(conn);
+			brdao.addBorrower(borrower);
+			conn.commit();
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			conn.rollback();
+		} finally{
+			if(conn!=null){
+				conn.close();
+			}
+		}
+	}
+	
+	public void editBorrower(Borrower borrower) throws SQLException{
+		Connection conn = null;
+		try {
+			conn = ConnectionUtil.getConnection();
+			BorrowerDAO brdao = new BorrowerDAO(conn);
+			brdao.updateBorrower(borrower);
+			conn.commit();
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			conn.rollback();
+		} finally{
+			if(conn!=null){
+				conn.close();
+			}
+		}
+	}
+	
+	public void addBranch(LibraryBranch branch) throws SQLException{
+		Connection conn = null;
+		try {
+			conn = ConnectionUtil.getConnection();
+			LibraryBranchDAO lbdao = new LibraryBranchDAO(conn);
+			lbdao.addBranch(branch);
+			conn.commit();
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			conn.rollback();
+		} finally{
+			if(conn!=null){
+				conn.close();
+			}
+		}
+	}
+	
+	public void editBranch(LibraryBranch branch) throws SQLException{
+		Connection conn = null;
+		try {
+			conn = ConnectionUtil.getConnection();
+			LibraryBranchDAO lbdao = new LibraryBranchDAO(conn);
+			lbdao.updateBranch(branch);
+			conn.commit();
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			conn.rollback();
+		} finally{
+			if(conn!=null){
+				conn.close();
+			}
+		}
+	}
+	
 	public List<Book> getAllBooks(Integer pageNo) throws SQLException{
 		Connection conn = null;
 		try {
@@ -181,6 +287,58 @@ public class AdminService {
 		}
 		return null;
 	}
+	
+	public List<Publisher> getAllPublishers(Integer pageNo) throws SQLException{
+		Connection conn = null;
+		try {
+			conn = ConnectionUtil.getConnection();
+			PublisherDAO pdao = new PublisherDAO(conn);
+			return pdao.readAllPublishers(pageNo);
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			conn.rollback();
+		} finally{
+			if(conn!=null){
+				conn.close();
+			}
+		}
+		return null;
+	}
+	
+	public List<Borrower> getAllBorrowers(Integer pageNo) throws SQLException{
+		Connection conn = null;
+		try {
+			conn = ConnectionUtil.getConnection();
+			BorrowerDAO brdao = new BorrowerDAO(conn);
+			return brdao.readAllBorrowers(pageNo);
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			conn.rollback();
+		} finally{
+			if(conn!=null){
+				conn.close();
+			}
+		}
+		return null;
+	}
+	
+	public List<LibraryBranch> getAllBranches(Integer pageNo) throws SQLException{
+		Connection conn = null;
+		try {
+			conn = ConnectionUtil.getConnection();
+			LibraryBranchDAO lbdao = new LibraryBranchDAO(conn);
+			return lbdao.readAllBranches(pageNo);
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+			conn.rollback();
+		} finally{
+			if(conn!=null){
+				conn.close();
+			}
+		}
+		return null;
+	}
+	
 	public Author getAuthorByPk(Integer authorId) throws SQLException{
 		Connection conn = null;
 		try {
@@ -261,6 +419,54 @@ public class AdminService {
 		return null;
 	}
 	
+	public Integer getBorrowersCount() throws SQLException{
+		Connection conn = null;
+		try {
+			conn = ConnectionUtil.getConnection();
+			BorrowerDAO brdao = new BorrowerDAO(conn);
+			return brdao.getBorrowersCount();
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+		} finally{
+			if(conn!=null){
+				conn.close();
+			}
+		}
+		return null;
+	}
+	
+	public Integer getBranchesCount() throws SQLException{
+		Connection conn = null;
+		try {
+			conn = ConnectionUtil.getConnection();
+			LibraryBranchDAO lbdao = new LibraryBranchDAO(conn);
+			return lbdao.getBranchesCount();
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+		} finally{
+			if(conn!=null){
+				conn.close();
+			}
+		}
+		return null;
+	}
+	
+	public Integer getBookLoansCount() throws SQLException{
+		Connection conn = null;
+		try {
+			conn = ConnectionUtil.getConnection();
+			PublisherDAO pdao = new PublisherDAO(conn);
+			return pdao.getPublishersCount();
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+		} finally{
+			if(conn!=null){
+				conn.close();
+			}
+		}
+		return null;
+	}
+	
 	public void deleteAuthor(Author author) throws SQLException{
 		Connection conn = null;
 		try {
@@ -299,6 +505,54 @@ public class AdminService {
 			conn = ConnectionUtil.getConnection();
 			GenreDAO gdao = new GenreDAO(conn);
 			gdao.deleteGenre(genre);
+			conn.commit();
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+		} finally{
+			if(conn!=null){
+				conn.close();
+			}
+		}
+	}
+	
+	public void deletePublisher(Publisher publisher) throws SQLException{
+		Connection conn = null;
+		try {
+			conn = ConnectionUtil.getConnection();
+			PublisherDAO pdao = new PublisherDAO(conn);
+			pdao.deletePublisher(publisher);
+			conn.commit();
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+		} finally{
+			if(conn!=null){
+				conn.close();
+			}
+		}
+	}
+	
+	public void deleteBorrower(Borrower borrower) throws SQLException{
+		Connection conn = null;
+		try {
+			conn = ConnectionUtil.getConnection();
+			BorrowerDAO brdao = new BorrowerDAO(conn);
+			brdao.deleteBorrower(borrower);
+			conn.commit();
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+		} finally{
+			if(conn!=null){
+				conn.close();
+			}
+		}
+	}
+	
+	public void deleteBranch(LibraryBranch branch) throws SQLException{
+		Connection conn = null;
+		try {
+			conn = ConnectionUtil.getConnection();
+			LibraryBranchDAO pdao = new LibraryBranchDAO(conn);
+			pdao.deleteBranch(branch);
 			conn.commit();
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
@@ -374,16 +628,21 @@ public class AdminService {
 		}
 		return null;
 	}
-	
-	public List<Publisher> getAllPublishers(Integer pageNo) throws SQLException{
+
+	/*
+	 * @param pageNo
+	 * @param searchString
+	 * @return
+	 */
+	public List<Publisher> getPublishersByName(Integer pageNoThenCount, String publisherName) throws SQLException{
 		Connection conn = null;
 		try {
 			conn = ConnectionUtil.getConnection();
 			PublisherDAO pdao = new PublisherDAO(conn);
-			return pdao.readAllPublishers(pageNo);
+			List<Publisher> publisherList = pdao.readPublishersByName(pageNoThenCount, publisherName);
+			return publisherList;
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
-			conn.rollback();
 		} finally{
 			if(conn!=null){
 				conn.close();
@@ -392,4 +651,47 @@ public class AdminService {
 		return null;
 	}
 
+	/*
+	 * @param pageNo
+	 * @param searchString
+	 * @return
+	 */
+	public List<Borrower> getBorrowersByName(Integer pageNoThenCount, String borrowerName) throws SQLException{
+		Connection conn = null;
+		try {
+			conn = ConnectionUtil.getConnection();
+			BorrowerDAO brdao = new BorrowerDAO(conn);
+			List<Borrower> borrowerList = brdao.readBorrowersByName(pageNoThenCount, borrowerName);
+			return borrowerList;
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+		} finally{
+			if(conn!=null){
+				conn.close();
+			}
+		}
+		return null;
+	}
+
+	/*
+	 * @param pageNo
+	 * @param searchString
+	 * @return
+	 */
+	public List<LibraryBranch> getBranchesByName(Integer pageNoThenCount, String branchName) throws SQLException{
+		Connection conn = null;
+		try {
+			conn = ConnectionUtil.getConnection();
+			LibraryBranchDAO pdao = new LibraryBranchDAO(conn);
+			List<LibraryBranch> branchList = pdao.readBranchesByName(pageNoThenCount, branchName);
+			return branchList;
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+		} finally{
+			if(conn!=null){
+				conn.close();
+			}
+		}
+		return null;
+	}
 }

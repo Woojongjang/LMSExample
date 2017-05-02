@@ -1,50 +1,51 @@
 package com.gcit.lms.entity;
 
 import java.io.Serializable;
-import java.util.List;
 
 public class LibraryBranch implements Serializable{
 	
-	private static final long serialVersionUID = 9151170513668626160L;
-
-	private Integer authorId;
-	private String authorName;
-	private List<Book> books;
 	/**
-	 * @return the authorId
+	 * 
 	 */
-	public Integer getAuthorId() {
-		return authorId;
+	private static final long serialVersionUID = -3445880759871935358L;
+	private Integer branchId;
+	private String branchName;
+	private String branchAddress;
+	/**
+	 * @return the branchId
+	 */
+	public Integer getBranchId() {
+		return branchId;
 	}
 	/**
-	 * @param authorId the authorId to set
+	 * @param branchId the branchId to set
 	 */
-	public void setAuthorId(Integer authorId) {
-		this.authorId = authorId;
+	public void setBranchId(Integer branchId) {
+		this.branchId = branchId;
 	}
 	/**
-	 * @return the authorName
+	 * @return the branchName
 	 */
-	public String getAuthorName() {
-		return authorName;
+	public String getBranchName() {
+		return branchName;
 	}
 	/**
-	 * @param authorName the authorName to set
+	 * @param branchName the branchName to set
 	 */
-	public void setAuthorName(String authorName) {
-		this.authorName = authorName;
+	public void setBranchName(String branchName) {
+		this.branchName = branchName;
 	}
 	/**
-	 * @return the books
+	 * @return the branchAddress
 	 */
-	public List<Book> getBooks() {
-		return books;
+	public String getBranchAddress() {
+		return branchAddress;
 	}
 	/**
-	 * @param books the books to set
+	 * @param branchAddress the branchAddress to set
 	 */
-	public void setBooks(List<Book> books) {
-		this.books = books;
+	public void setBranchAddress(String branchAddress) {
+		this.branchAddress = branchAddress;
 	}
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
@@ -53,8 +54,9 @@ public class LibraryBranch implements Serializable{
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((authorId == null) ? 0 : authorId.hashCode());
-		result = prime * result + ((authorName == null) ? 0 : authorName.hashCode());
+		result = prime * result + ((branchAddress == null) ? 0 : branchAddress.hashCode());
+		result = prime * result + ((branchId == null) ? 0 : branchId.hashCode());
+		result = prime * result + ((branchName == null) ? 0 : branchName.hashCode());
 		return result;
 	}
 	/* (non-Javadoc)
@@ -69,16 +71,22 @@ public class LibraryBranch implements Serializable{
 		if (getClass() != obj.getClass())
 			return false;
 		LibraryBranch other = (LibraryBranch) obj;
-		if (authorId == null) {
-			if (other.authorId != null)
+		if (branchAddress == null) {
+			if (other.branchAddress != null)
 				return false;
-		} else if (!authorId.equals(other.authorId))
+		} else if (!branchAddress.equals(other.branchAddress))
 			return false;
-		if (authorName == null) {
-			if (other.authorName != null)
+		if (branchId == null) {
+			if (other.branchId != null)
 				return false;
-		} else if (!authorName.equals(other.authorName))
+		} else if (!branchId.equals(other.branchId))
+			return false;
+		if (branchName == null) {
+			if (other.branchName != null)
+				return false;
+		} else if (!branchName.equals(other.branchName))
 			return false;
 		return true;
 	}
+	
 }

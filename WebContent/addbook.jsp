@@ -26,24 +26,24 @@
 	<form action="addBook" id="addbookform" method="post">
 		<div class="modal-body" class="container col-md-12">
 			<p>Enter the details of the new Book:</p>
-			Book Name: <input type="text" name="bookName" id="bookName" value="Add New Book Name..." size="50"><br />
+			Book Name: <input type="text" class="form-control" name="bookName" id="bookName" value="Add New Book Name..." size="50"><br />
 		</div>
 		<br/>
-		<div>
-			<p>Select Author(s) of the Book:</p>
-			<select name="authorlist" form="addbookform" multiple="multiple" size="8">
+		<div>	
+			<label for="selauth">Select Author(s) of the Book (hold ctrl to select more than one):</label>
+			<select class="form-control" name="authorlist" form="addbookform" multiple="multiple" id="selauth" size="8">
 			<%for(Author a: authorList) { %>
 				<option value="<%=a.getAuthorId() %>"><%=a.getAuthorName() %></option>
 			<%} %>
 			</select>
-			<p>Select a Publisher of the Book:</p>
-			<select name="publisherlist" form="addbookform" size="8">
+			<label for="selpub">Select Publisher of the Book:</label>
+			<select class="form-control" name="publisherlist" form="addbookform" id="selpub">
 				<%for(Publisher p: publisherList) { %>
 					<option value="<%=p.getPublisherId()%>"><%=p.getPublisherName() %></option>
 				<%} %>
 			</select>
-			<p>Select Genre(s) of the Book:</p>
-			<select name="genrelist" form="addbookform" multiple="multiple" size="8">
+			<label for="selgenr">Select Genre(s) of the Book (hold ctrl to select more than one):</label>
+			<select class="form-control" name="genrelist" form="addbookform" multiple="multiple" id="selgenr" size="8">
 				<%for(Genre g: genreList) { %>
 					<option value="<%=g.getGenreId()%>"><%=g.getGenreName() %></option>
 				<%} %>

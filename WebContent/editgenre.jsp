@@ -1,4 +1,3 @@
-<%@page import="com.gcit.lms.entity.Author"%>
 <%@page import="com.gcit.lms.service.AdminService"%>
 <%AdminService service = new AdminService();
 	Integer genreId = Integer.parseInt(request.getParameter("genreId"));
@@ -18,8 +17,8 @@
 	<form action="editGenre" method="post">
 		<div class="modal-body" class="container col-md-12">
 			<p>Enter the details of the Genre:</p>
-			Genre Name: <input type="text" name="genreName" id="genreName" value="<%=genreName%>"><br />
-			Genre ID: <input type="text" name="genreId" id="genreId" value="<%=genreId%>" readonly="readonly">
+			Genre Name: <input type="text" class="form-control" name="genreName" id="genreName" value="<%=genreName%>"><br />
+			Genre ID: <input type="text" class="form-control" name="genreId" id="genreId" value="<%=genreId%>" readonly="readonly">
 		</div>
 		<div class="modal-footer">
 			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

@@ -9,7 +9,7 @@ import java.util.List;
 import com.gcit.lms.entity.Genre;
 /**
  * This is a DAO
- * @genre ppradhan
+ * @genre woojong
  *
  */
 public class GenreDAO extends BaseDAO{

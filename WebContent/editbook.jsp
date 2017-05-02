@@ -32,29 +32,29 @@
 		<div class="modal-body" class="container col-md-12">
 			<p>Current details of the Book:</p>
 			<ul>
-				<li>Book Publisher: <%=bookPublisher%></li>
-				<li>Book Authors <%=bookAuthor%></li>
-				<li>Book Genres: <%=bookGenre%></li>
+				<li>Book Publisher: <p class="text-info"><%=bookPublisher%></p></li>
+				<li>Book Authors: <p class="text-info"><%=bookAuthor%></p></li>
+				<li>Book Genres: <p class="text-info"><%=bookGenre%></p></li>
 			</ul>
 			<p>Enter the details of the Book:</p>
-			Book Name: <input type="text" name="bookName" id="bookName" value="<%=bookName%>" size="50"><br />
-			Book ID: <input type="text" name="bookId" id="bookId" value="<%=bookId%>" readonly="readonly"><br/>
+			Book Name: <input type="text" class="form-control" name="bookName" id="bookName" value="<%=bookName%>" size="50"><br />
+			Book ID: <input type="text" class="form-control" name="bookId" id="bookId" value="<%=bookId%>" readonly="readonly"><br/>
 			<br/>
 			<div>
-				<p>Select Author(s) of the Book:</p>
-				<select name="authorlist" form="editbookform" multiple="multiple" size="8">
+				<label for="selauth">Select Author(s) of the Book (hold ctrl to select more than one):</label>
+				<select multiple class="form-control" name="authorlist" form="editbookform" id="selauth" size="8">
 				<%for(Author a: authorList) { %>
 					<option value="<%=a.getAuthorId() %>"><%=a.getAuthorName() %></option>
 				<%} %>
 				</select>
-				<p>Select a Publisher of the Book:</p>
-				<select name="publisherlist" form="editbookform" size="8">
+				<label for="selpub">Select Publisher of the Book:</label>
+				<select class="form-control" name="publisherlist" form="editbookform" id="selpub">
 					<%for(Publisher p: publisherList) { %>
 						<option value="<%=p.getPublisherId()%>"><%=p.getPublisherName() %></option>
 					<%} %>
 				</select>
-				<p>Select Genre(s) of the Book:</p>
-				<select name="genrelist" form="editbookform" multiple="multiple" size="8">
+				<label for="selgenr">Select Genre(s) of the Book (hold ctrl to select more than one):</label>
+				<select multiple class="form-control" name="genrelist" form="editbookform" id="selgenr" size="8">
 					<%for(Genre g: genreList) { %>
 						<option value="<%=g.getGenreId()%>"><%=g.getGenreName() %></option>
 					<%} %>

@@ -6,8 +6,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.plaf.synth.SynthSeparatorUI;
-
 import com.gcit.lms.entity.Author;
 import com.gcit.lms.entity.Book;
 import com.gcit.lms.entity.Genre;
@@ -106,8 +104,8 @@ public class BookDAO extends BaseDAO{
 			setPageNo(pageNo);
 			setPageSize(10);
 		}
-		List<Book> bookRead = read("select * from tbl_book", null);
-		return bookRead;
+		//List<Book> bookRead = read("select * from tbl_book", null);
+		return read("select * from tbl_book", null);
 	}
 
 	public Integer getBooksCount() throws ClassNotFoundException, SQLException{

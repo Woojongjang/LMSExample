@@ -30,7 +30,7 @@
 			dataType: "text json",
 			data:{
 				searchString: $('#searchString').val(),
-				count: pageNum
+				pageNo: pageNum
 			}
 		}).done(function (data){
 			$("#paginateId").empty();

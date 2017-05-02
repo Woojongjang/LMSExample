@@ -27,13 +27,13 @@
 	System.out.println(request.getRequestURI().substring(request.getContextPath().length(), request.getRequestURI().length()));
 %>
 <script>
-	function searchAuthors(pageNo){
+	function searchAuthors(pageNum){
 		$.ajax({
 			url: "searchAuthors",
 			dataType: "text json",
 			data:{
 				searchString: $('#searchString').val(),
-				count: pageNo
+				pageNo: pageNum
 			}
 		})
 		.done(function (data){

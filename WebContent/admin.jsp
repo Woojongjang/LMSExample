@@ -1,6 +1,8 @@
 <%@include file="include.html"%>
+<%session.setAttribute("userId", 0);%>
 
-<div class='page-header'>
+<div class="container">
+<div class='jumbotron'>
 	<h1>Administrator Services</h1>
 </div>
 <div class='row'>
@@ -16,7 +18,7 @@
 		</div>
 		<div class="panel panel-primary">
 			<div class="panel-heading">
-			<a href="viewborrowers.jsp" style='text-decoration: none'>
+			<a href="adminbookloan.jsp" style='text-decoration: none'>
 				<h3 class="panel-title" style='color:white'>Borrower Account Services</h3>
 				</a>
 			</div>
@@ -64,4 +66,5 @@
 				Book Information, List All Books</div>
 		</div>
 	</div>
+</div>
 </div>

@@ -16,7 +16,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.gcit.lms.entity.Author;
 import com.gcit.lms.entity.Book;
+import com.gcit.lms.entity.Borrower;
 import com.gcit.lms.entity.Genre;
+import com.gcit.lms.entity.LibraryBranch;
 import com.gcit.lms.entity.Publisher;
 import com.gcit.lms.service.AdminService;
 
@@ -25,7 +27,10 @@ import com.gcit.lms.service.AdminService;
  */
 @WebServlet({"/addAuthor", "/editAuthor", "/pageAuthors", "/deleteAuthor", "/searchAuthors",
 	"/pageBooks", "/editBook", "/addBook", "/deleteBook", "/searchBooks", 
-	"/addGenre", "/pageGenres", "/editGenre", "/deleteGenre", "/searchGenres"})
+	"/addGenre", "/pageGenres", "/editGenre", "/deleteGenre", "/searchGenres",
+	"/addPublisher", "/pagePublishers", "/editPublisher", "/deletePublisher", "/searchPublishers",
+	"/addBorrower", "/pageBorrowers", "/editBorrower", "/deleteBorrower", "/searchBorrowers",
+	"/addBranch", "/pageBranches", "/editBranch", "/deleteBranch", "/searchBranches"})
 public class AdminServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
@@ -56,6 +61,18 @@ public class AdminServlet extends HttpServlet {
 			pageGenres(request);
 			forwardPath = "/viewgenres.jsp";
 			break;
+		case "/pagePublishers":
+			pagePublishers(request);
+			forwardPath = "/viewpublishers.jsp";
+			break;
+		case "/pageBranches":
+			pageBranches(request);
+			forwardPath = "/viewlibraries.jsp";
+			break;
+		case "/pageBorrowers":
+			pageBorrowers(request);
+			forwardPath = "/viewborrowers.jsp";
+			break;
 		case "/searchAuthors":
 			String aData = searchAuthors(request);
 			response.setContentType("application/json");
@@ -78,6 +95,27 @@ public class AdminServlet extends HttpServlet {
 			response.setContentType("application/json");
 		    response.setCharacterEncoding("UTF-8");
 		    response.getWriter().write(gData);
+			isAjax = Boolean.TRUE;
+			break;
+		case "/searchPublishers":
+			String pData = searchPublishers(request);
+			response.setContentType("application/json");
+		    response.setCharacterEncoding("UTF-8");
+		    response.getWriter().write(pData);
+			isAjax = Boolean.TRUE;
+			break;
+		case "/searchBorrowers":
+			String brData = searchBorrowers(request);
+			response.setContentType("application/json");
+		    response.setCharacterEncoding("UTF-8");
+		    response.getWriter().write(brData);
+			isAjax = Boolean.TRUE;
+			break;
+		case "/searchBranches":
+			String lbData = searchBranches(request);
+			response.setContentType("application/json");
+		    response.setCharacterEncoding("UTF-8");
+		    response.getWriter().write(lbData);
 			isAjax = Boolean.TRUE;
 			break;
 		default:
@@ -131,6 +169,41 @@ public class AdminServlet extends HttpServlet {
 		case "/deleteGenre":
 			deleteGenre(request);
 			forwardPath = "/viewgenres.jsp";
+		case "/addPublisher":
+			addPublisher(request);
+			forwardPath = "/viewpublishers.jsp";
+			break;
+		case "/editPublisher":
+			editPublisher(request);
+			forwardPath = "/viewpublishers.jsp";
+			break;
+		case "/deletePublisher":
+			deletePublisher(request);
+			forwardPath = "/viewpublishers.jsp";
+			break;
+		case "/addBorrower":
+			addBorrower(request);
+			forwardPath = "/viewborrowers.jsp";
+			break;
+		case "/editBorrower":
+			editBorrower(request);
+			forwardPath = "/viewborrowers.jsp";
+			break;
+		case "/deleteBorrower":
+			deleteBorrower(request);
+			forwardPath = "/viewborrowers.jsp";
+			break;
+		case "/addBranch":
+			addBranch(request);
+			forwardPath = "/viewlibraries.jsp";
+			break;
+		case "/editBranch":
+			editBranch(request);
+			forwardPath = "/viewlibraries.jsp";
+			break;
+		case "/deleteBranch":
+			deleteBranch(request);
+			forwardPath = "/viewlibraries.jsp";
 			break;
 		default:
 			break;
@@ -209,7 +282,7 @@ public class AdminServlet extends HttpServlet {
 			request.setAttribute("pageNo", authorSize);
 			strBuf.append("<thead><tr><th>#</th><th>Author Name</th><th>Author ID</th><th>Edit</th><th>Delete</th></tr></thead><tbody>");
 			for (Author a : authors) {
-				strBuf.append("<tr><td>" + authors.indexOf(a) + 1 + "</td><td>" + a.getAuthorName() + "</td><td>"+a.getAuthorId()+"</td>");
+				strBuf.append("<tr><td>" + (authors.indexOf(a) + 1) + "</td><td>" + a.getAuthorName() + "</td><td>"+a.getAuthorId()+"</td>");
 				strBuf.append(
 						"<td><button type='button' class='btn btn-primary' data-toggle='modal' data-target='#editAuthorModal'href='editauthor.jsp?authorId="
 								+ a.getAuthorId() + "'>Update</button></td>");
@@ -346,7 +419,7 @@ public class AdminServlet extends HttpServlet {
 			}
 			List<Book> books = service.getBooksByName(pageNo, searchString);
 			bookSize = books.size();
-			request.setAttribute("pageNo", bookSize);
+			request.setAttribute("count", bookSize);
 			strBuf.append("<thead><tr><th>#</th><th>Book Name</th><th>Book ID</th><th>Authors</th><th>Genres</th><th>Publisher</th><th>Edit</th><th>Delete</th></tr></thead><tbody>");
 			for (Book b : books) {
 				String bookName = b.getTitle();
@@ -357,7 +430,7 @@ public class AdminServlet extends HttpServlet {
 				String bookAuthors = b.getAuthorString();
 				String bookGenreSpace = URLEncoder.encode(bookGenres,"UTF-8");
 				String bookAuthorSpace = URLEncoder.encode(bookAuthors,"UTF-8");
-				strBuf.append("<tr><td>" + books.indexOf(b) + 1 + "</td><td>" + bookName + "</td><td>"+b.getBookId()+"</td><td>"+bookAuthors+"</td><td>"+bookGenres+"</td><td>"+bookPublisher+"</td>");
+				strBuf.append("<tr><td>" + (books.indexOf(b) + 1) + "</td><td>" + bookName + "</td><td>"+b.getBookId()+"</td><td>"+bookAuthors+"</td><td>"+bookGenres+"</td><td>"+bookPublisher+"</td>");
 				strBuf.append("<td><button type='button' class='btn btn-primary' data-toggle='modal' data-target='#editBookModal'href='editbook.jsp?bookId="
 						+ b.getBookId()+"&amp;bookName="+bookNameSpace+"&amp;bookPublisher="+bookPubSpace
 						+"&amp;bookGenre="+bookGenreSpace+"&amp;bookAuthor="+bookAuthorSpace+"'>Update</button></td>");
@@ -437,13 +510,13 @@ public class AdminServlet extends HttpServlet {
 			}
 			List<Genre> genres = service.getGenresByName(pageNo, searchString);
 			genreSize = genres.size();
-			request.setAttribute("pageNo", genreSize);
+			request.setAttribute("count", genreSize);
 			strBuf.append("<thead><tr><th>#</th><th>Genre Name</th><th>Genre ID</th><th>Edit</th><th>Delete</th></tr></thead><tbody>");
 			for (Genre g : genres) {
 				String genreName = g.getGenreName();
 				Integer genreID = g.getGenreId();
 				String genreNameEnc = URLEncoder.encode(genreName, "UTF-8");
-				strBuf.append("<tr><td>" + genres.indexOf(g) + 1 + "</td><td>" + genreName + "</td><td>"+genreID+"</td>");
+				strBuf.append("<tr><td>" + (genres.indexOf(g) + 1) + "</td><td>" + genreName + "</td><td>"+genreID+"</td>");
 				strBuf.append("<td><button type='button' class='btn btn-primary' data-toggle='modal' data-target='#editGenreModal' "
 				+"href='editgenre.jsp?genreId="+genreID+"&amp;genreName="+genreNameEnc+"'>Update</button></td>");
 				strBuf.append("<td><form action='deleteGenre' method='post'><input type='hidden' name='genreId' id='genreId' value='"
@@ -472,6 +545,291 @@ public class AdminServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 		String jsonData = "{ \"key1\": \""+strBuf.toString()+"\", \"key2\": "+genreSize+" }";
+		return jsonData;
+	}
+	
+	private void addPublisher(HttpServletRequest request) {
+		Publisher publisher = new Publisher();
+		publisher.setPublisherName(request.getParameter("publisherName"));
+		publisher.setPublisherAddress(request.getParameter("publisherAddr"));
+		publisher.setPublisherPhone(request.getParameter("publisherPhone"));
+		AdminService service = new AdminService();
+		try {
+			service.addPublisher(publisher);
+			request.setAttribute("addMsg", "Publisher Add Successful");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void pagePublishers(HttpServletRequest request) {
+		Integer pageNo = Integer.parseInt(request.getParameter("pageNo"));
+		AdminService service = new AdminService();
+		try {
+			request.setAttribute("publishers", service.getAllPublishers(pageNo));
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void editPublisher(HttpServletRequest request) {
+		Publisher publisher = new Publisher();
+		publisher.setPublisherName(request.getParameter("publisherName"));
+		publisher.setPublisherId(Integer.parseInt(request.getParameter("publisherId")));
+		publisher.setPublisherAddress(request.getParameter("publisherAddr"));
+		publisher.setPublisherPhone(request.getParameter("publisherPhone"));
+		AdminService service = new AdminService();
+		try {
+			service.editPublisher(publisher);
+			request.setAttribute("message", "Publisher Edit Successful");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void deletePublisher(HttpServletRequest request) {
+		Publisher publisher = new Publisher();
+		publisher.setPublisherId(Integer.parseInt(request.getParameter("publisherId")));
+		AdminService service = new AdminService();
+		try {
+			service.deletePublisher(publisher);
+			request.setAttribute("deleteMsg", "Publisher Delete Successful");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private String searchPublishers(HttpServletRequest request) {
+		String searchString = request.getParameter("searchString");
+		AdminService service = new AdminService();
+		StringBuffer strBuf = new StringBuffer();
+		Integer pageNo = 1;
+		Integer publisherSize = 1;
+		try {
+			// request.setAttribute("authors", service.getAuthorsByName(1,
+			// searchString));
+			//ADD LAST AUTHOR WITH COUNT AS ID IF THIS DOESNT WORK
+			String pageNum = request.getParameter("pageNo");
+			if(pageNum != null) {
+				pageNo = Integer.parseInt(pageNum);
+			}
+			List<Publisher> publishers = service.getPublishersByName(pageNo, searchString);
+			publisherSize = publishers.size();
+			request.setAttribute("count", publisherSize);
+			strBuf.append("<thead><tr><th>#</th><th>Publisher Name</th><th>Publisher ID</th>"
+					+"<th>Publisher Address</th><th>Publisher Phone</th><th>Edit</th><th>Delete</th></tr></thead><tbody>");
+			for (Publisher p : publishers) {
+				String publisherName = p.getPublisherName();
+				String publisherAddr = p.getPublisherAddress();
+				String publisherPhone = p.getPublisherPhone();
+				Integer publisherID = p.getPublisherId();
+				String publisherNameEnc = URLEncoder.encode(publisherName, "UTF-8");
+				String publisherAddrEnc = URLEncoder.encode(publisherAddr, "UTF-8");
+				String publisherPhoneEnc = URLEncoder.encode(publisherPhone, "UTF-8");
+				strBuf.append("<tr><td>" + (publishers.indexOf(p) + 1) + "</td><td>" + publisherName + "</td><td>"+publisherID+"</td>"
+						+"<td>"+publisherAddr+"</td><td>"+publisherPhone+"</td>");
+				strBuf.append("<td><button type='button' class='btn btn-primary' data-toggle='modal' data-target='#editPublisherModal' "
+				+"href='editpublisher.jsp?publisherId="+publisherID+"&amp;publisherName="+publisherNameEnc+
+				"&amp;publisherAddr="+publisherAddrEnc+"&amp;publisherPhone="+publisherPhoneEnc+"'>Update</button></td>");
+				strBuf.append("<td><form action='deletePublisher' method='post'><input type='hidden' name='publisherId' id='publisherId'"
+						+" value='"+publisherID+"'><button class='btn btn-danger'>Delete</button></form></td></tr>");
+			}
+			strBuf.append("</tbody>");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		String jsonData = "{ \"key1\": \""+strBuf.toString()+"\", \"key2\": "+publisherSize+" }";
+		return jsonData;
+	}
+	
+	private void addBorrower(HttpServletRequest request) {
+		Borrower borrower = new Borrower();
+		borrower.setBorrowerName(request.getParameter("borrowerName"));
+		borrower.setBorrowerAddress(request.getParameter("borrowerAddr"));
+		borrower.setBorrowerPhone(request.getParameter("borrowerPhone"));
+		AdminService service = new AdminService();
+		try {
+			service.addBorrower(borrower);
+			request.setAttribute("addMsg", "Borrower Add Successful");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void pageBorrowers(HttpServletRequest request) {
+		Integer pageNo = Integer.parseInt(request.getParameter("pageNo"));
+		AdminService service = new AdminService();
+		try {
+			request.setAttribute("borrowers", service.getAllBorrowers(pageNo));
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void editBorrower(HttpServletRequest request) {
+		Borrower borrower = new Borrower();
+		borrower.setBorrowerName(request.getParameter("borrowerName"));
+		borrower.setBorrowerId(Integer.parseInt(request.getParameter("borrowerId")));
+		borrower.setBorrowerAddress(request.getParameter("borrowerAddr"));
+		borrower.setBorrowerPhone(request.getParameter("borrowerPhone"));
+		AdminService service = new AdminService();
+		try {
+			service.editBorrower(borrower);
+			request.setAttribute("message", "Borrower Edit Successful");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void deleteBorrower(HttpServletRequest request) {
+		Borrower borrower = new Borrower();
+		borrower.setBorrowerId(Integer.parseInt(request.getParameter("borrowerId")));
+		AdminService service = new AdminService();
+		try {
+			service.deleteBorrower(borrower);
+			request.setAttribute("deleteMsg", "Borrower Delete Successful");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private String searchBorrowers(HttpServletRequest request) {
+		String searchString = request.getParameter("searchString");
+		AdminService service = new AdminService();
+		StringBuffer strBuf = new StringBuffer();
+		Integer pageNo = 1;
+		Integer borrowerSize = 1;
+		try {
+			// request.setAttribute("authors", service.getAuthorsByName(1,
+			// searchString));
+			//ADD LAST AUTHOR WITH COUNT AS ID IF THIS DOESNT WORK
+			String pageNum = request.getParameter("pageNo");
+			if(pageNum != null) {
+				pageNo = Integer.parseInt(pageNum);
+			}
+			List<Borrower> borrowers = service.getBorrowersByName(pageNo, searchString);
+			borrowerSize = borrowers.size();
+			request.setAttribute("count", borrowerSize);
+			strBuf.append("<thead><tr><th>#</th><th>Borrower Name</th><th>Borrower Card Number</th>"
+					+"<th>Borrower Address</th><th>Borrower Phone</th><th>Edit</th><th>Delete</th></tr></thead><tbody>");
+			for (Borrower p : borrowers) {
+				String borrowerName = p.getBorrowerName();
+				String borrowerAddr = p.getBorrowerAddress();
+				String borrowerPhone = p.getBorrowerPhone();
+				Integer borrowerID = p.getBorrowerId();
+				String borrowerNameEnc = URLEncoder.encode(borrowerName, "UTF-8");
+				String borrowerAddrEnc = URLEncoder.encode(borrowerAddr, "UTF-8");
+				String borrowerPhoneEnc = URLEncoder.encode(borrowerPhone, "UTF-8");
+				strBuf.append("<tr><td>" + (borrowers.indexOf(p) + 1) + "</td><td>" + borrowerName + "</td><td>"+borrowerID+"</td>"
+						+"<td>"+borrowerAddr+"</td><td>"+borrowerPhone+"</td>");
+				strBuf.append("<td><a href='borrowerloan.jsp?borrowerId="+borrowerID+"' class='btn btn-info' style='color:white'>Loans</a></td>");
+				strBuf.append("<td><button type='button' class='btn btn-primary' data-toggle='modal' data-target='#editBorrowerModal' "
+				+"href='editborrower.jsp?borrowerId="+borrowerID+"&amp;borrowerName="+borrowerNameEnc+
+				"&amp;borrowerAddr="+borrowerAddrEnc+"&amp;borrowerPhone="+borrowerPhoneEnc+"'>Update</button></td>");
+				strBuf.append("<td><form action='deleteBorrower' method='post'><input type='hidden' name='borrowerId' id='borrowerId'"
+						+" value='"+borrowerID+"'><button class='btn btn-danger'>Delete</button></form></td></tr>");
+			}
+			strBuf.append("</tbody>");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		String jsonData = "{ \"key1\": \""+strBuf.toString()+"\", \"key2\": "+borrowerSize+" }";
+		return jsonData;
+	}
+	
+	private void addBranch(HttpServletRequest request) {
+		LibraryBranch branch = new LibraryBranch();
+		branch.setBranchName(request.getParameter("branchName"));
+		branch.setBranchAddress(request.getParameter("branchAddr"));
+		AdminService service = new AdminService();
+		try {
+			service.addBranch(branch);
+			request.setAttribute("addMsg", "Library Branch Add Successful");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void pageBranches(HttpServletRequest request) {
+		Integer pageNo = Integer.parseInt(request.getParameter("pageNo"));
+		AdminService service = new AdminService();
+		try {
+			request.setAttribute("branches", service.getAllBranches(pageNo));
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void editBranch(HttpServletRequest request) {
+		LibraryBranch branch = new LibraryBranch();
+		branch.setBranchName(request.getParameter("branchName"));
+		branch.setBranchId(Integer.parseInt(request.getParameter("branchId")));
+		branch.setBranchAddress(request.getParameter("branchAddr"));
+		AdminService service = new AdminService();
+		try {
+			service.editBranch(branch);
+			request.setAttribute("message", "Library Branch Edit Successful");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void deleteBranch(HttpServletRequest request) {
+		LibraryBranch branch = new LibraryBranch();
+		branch.setBranchId(Integer.parseInt(request.getParameter("branchId")));
+		AdminService service = new AdminService();
+		try {
+			service.deleteBranch(branch);
+			request.setAttribute("deleteMsg", "LibraryBranch Delete Successful");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private String searchBranches(HttpServletRequest request) {
+		String searchString = request.getParameter("searchString");
+		AdminService service = new AdminService();
+		StringBuffer strBuf = new StringBuffer();
+		Integer pageNo = 1;
+		Integer branchSize = 1;
+		try {
+			// request.setAttribute("authors", service.getAuthorsByName(1,
+			// searchString));
+			//ADD LAST AUTHOR WITH COUNT AS ID IF THIS DOESNT WORK
+			String pageNum = request.getParameter("pageNo");
+			if(pageNum != null) {
+				pageNo = Integer.parseInt(pageNum);
+			}
+			List<LibraryBranch> branches = service.getBranchesByName(pageNo, searchString);
+			branchSize = branches.size();
+			request.setAttribute("count", branchSize);
+			strBuf.append("<thead><tr><th>#</th><th>Branch Name</th><th>Branch Id</th>"
+					+"<th>Branch Address</th><th>Edit</th><th>Delete</th></tr></thead><tbody>");
+			for (LibraryBranch p : branches) {
+				String branchName = p.getBranchName();
+				String branchAddr = p.getBranchAddress();
+				Integer branchID = p.getBranchId();
+				String branchNameEnc = URLEncoder.encode(branchName, "UTF-8");
+				String branchAddrEnc = URLEncoder.encode(branchAddr, "UTF-8");
+				strBuf.append("<tr><td>" + (branches.indexOf(p) + 1) + "</td><td>" + branchName + "</td><td>"+branchID+"</td>"
+						+"<td>"+branchAddr+"</td>");
+				strBuf.append("<td><button type='button' class='btn btn-primary' data-toggle='modal' data-target='#editBranchModal' "
+				+"href='editbranch.jsp?branchId="+branchID+"&amp;branchName="+branchNameEnc+
+				"&amp;branchAddr="+branchAddrEnc+"'>Update</button></td>");
+				strBuf.append("<td><form action='deleteBranch' method='post'><input type='hidden' name='branchId' id='branchId'"
+						+" value='"+branchID+"'><button class='btn btn-danger'>Delete</button></form></td></tr>");
+			}
+			strBuf.append("</tbody>");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		String jsonData = "{ \"key1\": \""+strBuf.toString()+"\", \"key2\": "+branchSize+" }";
 		return jsonData;
 	}
 }

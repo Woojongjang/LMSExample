@@ -4,12 +4,13 @@
 			aria-label="Close">
 			<span aria-hidden="true">&times;</span>
 		</button>
-		<h4 class="modal-title">Add New Genre Details</h4>
+		<h4 class="modal-title">Add New Library Branch Details</h4>
 	</div>
-	<form action="addGenre" method="post">
+	<form action="addBranch" method="post">
 		<div class="modal-body">
-			<p>Enter the details of the new Genre:</p>
-			Genre Name: <input type="text" class="form-control" name="genreName" id="genreName" value="New Genre Name"><br />
+			<p>Enter the details of the new Branch:</p>
+			Branch Name: <input type="text" name="branchName" id="branchName" value="New Branch Name"><br />
+			Branch Address: <input type="text" name="branchAddr" id="branchAddr" value="New Branch Address"><br />
 		</div>
 		<div class="modal-footer">
 			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

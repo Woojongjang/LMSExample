@@ -9,7 +9,7 @@ import java.util.List;
 import com.gcit.lms.entity.Publisher;
 /**
  * This is a DAO
- * @publisher ppradhan
+ * @publisher woojong
  *
  */
 public class PublisherDAO extends BaseDAO{
@@ -24,7 +24,8 @@ public class PublisherDAO extends BaseDAO{
 	}
 	
 	public void updatePublisher(Publisher publisher) throws ClassNotFoundException, SQLException{
-		save("update tbl_publisher set publisherName = ? where publisherId = ?", new Object[]{publisher.getPublisherName(), publisher.getPublisherId()});
+		save("update tbl_publisher set publisherName = ?, publisherAddress = ?, publisherPhone = ? where publisherId = ?",
+				new Object[]{publisher.getPublisherName(), publisher.getPublisherAddress(),publisher.getPublisherPhone(), publisher.getPublisherId()});
 	}
 	
 	public void deletePublisher(Publisher publisher) throws ClassNotFoundException, SQLException{
@@ -54,8 +55,10 @@ public class PublisherDAO extends BaseDAO{
 	}
 	
 	public List<Publisher> readPublishersByName(Integer pageNo, String  publisherName) throws ClassNotFoundException, SQLException{
-		setPageNo(pageNo);
-		setPageSize(10);
+		if(pageNo!=null) {
+			setPageNo(pageNo);
+			setPageSize(10);
+		}
 		publisherName = "%"+publisherName+"%";
 		List<Publisher> retList = read("select * from tbl_publisher where publisherName like ?", new Object[]{publisherName});
 		return retList;
@@ -72,8 +75,36 @@ public class PublisherDAO extends BaseDAO{
 		while(rs.next()){
 			Publisher p = new Publisher();
 			p.setPublisherId(rs.getInt("publisherId"));
-			p.setPublisherName(rs.getString("publisherName"));
-			p.setPublisherAddress(rs.getString("publisherAddress"));
+			String name = rs.getString("publisherName");
+			String addr = rs.getString("publisherAddress");
+			String phone = rs.getString("publisherPhone");
+			if(name == null){
+				p.setPublisherName("NO PUBLISHER NAME");
+			}
+			else if(name.equals("")){
+				p.setPublisherName("NO PUBLISHER NAME");
+			}
+			else {
+				p.setPublisherName(name);
+			}
+			if(addr == null){
+				p.setPublisherAddress("NO PUBLISHER ADDRESS");
+			}
+			else if(addr.equals("")){
+				p.setPublisherAddress("NO PUBLISHER ADDRESS");
+			}
+			else {
+				p.setPublisherAddress(addr);
+			}
+			if(phone == null){
+				p.setPublisherPhone("NO PUBLISHER PHONE");
+			}
+			else if(phone.equals("")){
+				p.setPublisherPhone("NO PUBLISHER PHONE");
+			}
+			else {
+				p.setPublisherPhone(phone);
+			}
 			//a.setBooks(bdao.readFirstLevel("select * from tbl_book where bookId IN (Select bookId from tbl_book_publishers where publisherId = ?)", new Object[]{a.getPublisherId()}));
 			publishers.add(p);
 		}

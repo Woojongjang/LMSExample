@@ -1,32 +1,31 @@
-<%@page import="javax.print.URIException"%>
 <%@include file="include.html"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
 <%@page import="java.net.URLEncoder"%>
-<%@page import="com.gcit.lms.entity.Genre"%>
+<%@page import="com.gcit.lms.entity.LibraryBranch"%>
 <%@page import="com.gcit.lms.service.AdminService"%>
 
 
 <%
 	AdminService service = new AdminService();
-	Integer genresCount = service.getGenresCount();
+	Integer branchesCount = service.getBranchesCount();
 	Integer numOfPages = 0;
-	if (genresCount % 10 > 0) {
-		numOfPages = genresCount / 10 + 1;
+	if (branchesCount % 10 > 0) {
+		numOfPages = branchesCount / 10 + 1;
 	} else {
-		numOfPages = genresCount / 10;
+		numOfPages = branchesCount / 10;
 	}
-	List<Genre> genres = new ArrayList<>();
-	if (request.getAttribute("genres") != null) {
-		genres = (List<Genre>) request.getAttribute("genres");
+	List<LibraryBranch> branches = new ArrayList<>();
+	if (request.getAttribute("branches") != null) {
+		branches = (List<LibraryBranch>) request.getAttribute("branches");
 	} else {
-		genres = service.getAllGenres(1);
+		branches = service.getAllBranches(1);
 	}
 %>
 <script>
-	function searchGenres(pageNum){
+	function searchBranches(pageNum){
 		$.ajax({
-			url: "searchGenres",
+			url: "searchBranches",
 			dataType: "text json",
 			data:{
 				searchString: $('#searchString').val(),
@@ -34,7 +33,7 @@
 			}
 		}).done(function (data){
 			$("#paginateId").empty();
-			$('#genreTable').html(data.key1)
+			$('#branchesTable').html(data.key1)
 		})
 		.fail(function(data) {
 		    alert('IT FAILED');
@@ -72,16 +71,16 @@
 			}
 		%>
 		<div class="page-header">
-			<h1>List of Genres in LMS</h1>
+			<h1>List of Library Branches in LMS</h1>
 		</div>
 		<button type="button" class="btn btn-success"
-			data-toggle="modal" data-target="#editGenreModal"
-			href="addgenre.jsp">Add New Genre</button><br/><br/>
+			data-toggle="modal" data-target="#editBranchModal"
+			href="addbranch.jsp">Add New Branch</button><br/><br/>
 		<div class="input-group">
-			<form action="searchGenres">
+			<form action="searchBranches">
 				<input type="text" class="form-control" name="searchString"
 					id="searchString" placeholder="Search for..."
-					oninput="searchGenres(1);">
+					oninput="searchBranches(1);">
 			</form>
 		</div>
 		<nav aria-label="Page navigation">
@@ -94,51 +93,56 @@
 				}
 				if(pageNo != 1) {
 			%>
-				<li><a href="pageGenres?pageNo=<%=pageNo-1 %>" aria-label="Previous" onclick="searchBooks(<%=pageNo-1 %>);"> <span
+				<li><a href="pageBranches?pageNo=<%=pageNo-1 %>" aria-label="Previous" onclick="searchBranches(<%=pageNo-1 %>);"> <span
 						aria-hidden="true">&laquo;</span>
 				</a></li>
 			<%} %>
 				<%
 					for (int i = 1; i <= numOfPages; i++) {
 				%>
-						<li><a href="pageGenres?pageNo=<%=i%>"><%=i%></a></li>
+						<li><a href="pageBranches?pageNo=<%=i%>"><%=i%></a></li>
 				<%
 					}
 				%>
 				<%
 				if(pageNo != numOfPages) {%>
-				<li><a href="pageGenres?pageNo=<%=pageNo+1 %>" aria-label="Next"> <span aria-hidden="true">&raquo;</span>
+				<li><a href="pageBranches?pageNo=<%=pageNo+1 %>" aria-label="Next"> <span aria-hidden="true">&raquo;</span>
 				</a></li>
 				<%} %>
 			</ul>
 		</nav>
-		<div class="col-md-8">
-			<table class="table table-striped" id="genreTable">
+		<div class="col-md-12">
+			<table class="table table-striped" id="branchesTable">
 				<thead>
 					<tr>
 						<th>#</th>
-						<th>Genre Name</th>
-						<th>Genre ID</th>
+						<th>Branch Name</th>
+						<th>Branch ID</th>
+						<th>Branch Address</th>
 						<th>Edit</th>
 						<th>Delete</th>
 					</tr>
 				</thead>
 				<tbody>
 					<%
-						for (Genre g : genres) {
-							String genreName = g.getGenreName();
-							Integer genreID = g.getGenreId();
-							String genreNameEnc = URLEncoder.encode(genreName, "UTF-8");
+						for (LibraryBranch p : branches) {
+							String branchName = p.getBranchName();
+							String branchAddr = p.getBranchAddress();
+							Integer branchID = p.getBranchId();
+							String branchNameEnc = URLEncoder.encode(branchName, "UTF-8");
+							String branchAddrEnc = URLEncoder.encode(branchAddr, "UTF-8");
+							
 					%>
 					<tr>
-						<td><%=genres.indexOf(g) + 1%></td>
-						<td><%=genreName%></td>
-						<td><%=genreID%></td>
+						<td><%=branches.indexOf(p) + 1%></td>
+						<td><%=branchName%></td>
+						<td><%=branchID%></td>
+						<td><%=branchAddr%></td>
 						<td><button type="button" class="btn btn-primary"
-								data-toggle="modal" data-target="#editGenreModal"
-								href="editgenre.jsp?genreId=<%=genreID%>&amp;genreName=<%=genreNameEnc%>">Update</button></td>
-						<td><form action="deleteGenre" method="post">
-							<input type="hidden" name="genreId" id="genreId" value="<%=genreID%>">
+								data-toggle="modal" data-target="#editBranchModal"
+								href="editbranch.jsp?branchId=<%=branchID%>&amp;branchName=<%=branchNameEnc%>&amp;branchAddr=<%=branchAddrEnc%>">Update</button></td>
+						<td><form action="deleteBranch" method="post">
+							<input type="hidden" name="branchId" id="branchId" value="<%=branchID%>">
 							<button  class="btn btn-danger">Delete</button>
 							</form></td>
 					</tr>
@@ -150,7 +154,7 @@
 		</div>
 	</div>
 </div>
-<div class="modal fade" id="editGenreModal"
+<div class="modal fade" id="editBranchModal"
 	tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">....</div>

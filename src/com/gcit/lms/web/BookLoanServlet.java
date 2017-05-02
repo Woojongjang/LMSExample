@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -20,20 +21,20 @@ import com.gcit.lms.entity.Book;
 import com.gcit.lms.entity.BookLoan;
 import com.gcit.lms.entity.Borrower;
 import com.gcit.lms.entity.LibraryBranch;
+import com.gcit.lms.service.AdminService;
 import com.gcit.lms.service.BookLoanService;
-import com.gcit.lms.service.BorrowerService;
 
 /**
- * Servlet implementation class BorrowerServlet
+ * Servlet implementation class BookLoanServlet
  */
-@WebServlet({"/BorrowerServlet", "/borrowLogin"})
-public class BorrowerServlet extends HttpServlet {
-	private static final long serialVersionUID = 2888013528754996495L;
+@WebServlet({"/BookLoanServlet", "/addBookLoan", "/pageBookLoans", "/editBookLoan", "/deleteBookLoan", "/searchBookLoans"})
+public class BookLoanServlet extends HttpServlet {
+	private static final long serialVersionUID = -7537088797044049099L;
 
 	/**
      * @see HttpServlet#HttpServlet()
      */
-    public BorrowerServlet() {
+    public BookLoanServlet() {
         super();
     }
 
@@ -45,9 +46,16 @@ public class BorrowerServlet extends HttpServlet {
 		String forwardPath = "/welcome.jsp";
 		Boolean isAjax = Boolean.FALSE;
 		switch (reqUrl) {
-		case "/borrowLogin":
-			//System.out.println("inside BorrowerServlet:" +request.getRequestURI());
-			forwardPath = borrowerLogin(request); 
+		case "/pageBookLoans":
+			pageBookLoans(request);
+			forwardPath = "/viewbookloans.jsp";
+			break;
+		case "/searchBookLoans":
+			String brData = searchBookLoans(request);
+			response.setContentType("application/json");
+		    response.setCharacterEncoding("UTF-8");
+		    response.getWriter().write(brData);
+			isAjax = Boolean.TRUE;
 			break;
 		default:
 			break;
@@ -62,35 +70,28 @@ public class BorrowerServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		doGet(request, response);
-	}
-	
-	private String borrowerLogin(HttpServletRequest request) {
-		Integer cardNo = Integer.parseInt(request.getParameter("cardId"));
-		BorrowerService service = new BorrowerService();
-		String forwardPath = "/borrowerlogin.jsp";
-		boolean loginCheck = false;
-		
-		try {
-			loginCheck = service.checkBorrowerId(cardNo);
-			HttpSession session = request.getSession();
-			if(loginCheck) {
-				System.out.println("inside BorrowerServlet:SUCESS");
-				session.setAttribute("userId", request.getParameter("cardId"));
-				forwardPath = "/borrower.jsp";
-				request.setAttribute("message", "Login Successful");
-				return forwardPath;
-			}
-			else {
-				request.setAttribute("error", "Login UNSUCCESSFUL");
-				return forwardPath;
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
+		String reqUrl = request.getRequestURI().substring(request.getContextPath().length(), request.getRequestURI().length());
+		String forwardPath = "/welcome.jsp";
+		switch(reqUrl) {
+			case "/addBookLoan":
+				addBookLoan(request);
+				forwardPath = "/viewbookloans.jsp";
+				break;
+			case "/editBookLoan":
+				editBookLoan(request);
+				forwardPath = "/viewbookloans.jsp";
+				break;
+			case "/deleteBookLoan":
+				deleteBookLoan(request);
+				forwardPath = "/viewbookloans.jsp";
+				break;
+			default:
+				break;
 		}
-		return forwardPath;
+		RequestDispatcher rd = request.getRequestDispatcher(forwardPath);
+		rd.forward(request, response);
 	}
-	
+
 	private void addBookLoan(HttpServletRequest request) {
 		BookLoan loan = new BookLoan();
 		HttpSession session = request.getSession();
@@ -148,7 +149,7 @@ public class BorrowerServlet extends HttpServlet {
 		Integer pageNo = Integer.parseInt(request.getParameter("pageNo"));
 		BookLoanService service = new BookLoanService();
 		try {
-			request.setAttribute("borrowerloans", service.getAllBookLoans(pageNo));
+			request.setAttribute("loans", service.getAllBookLoans(pageNo));
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

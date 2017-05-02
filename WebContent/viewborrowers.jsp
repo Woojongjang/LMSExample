@@ -1,32 +1,31 @@
-<%@page import="javax.print.URIException"%>
 <%@include file="include.html"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
 <%@page import="java.net.URLEncoder"%>
-<%@page import="com.gcit.lms.entity.Genre"%>
+<%@page import="com.gcit.lms.entity.Borrower"%>
 <%@page import="com.gcit.lms.service.AdminService"%>
 
 
 <%
 	AdminService service = new AdminService();
-	Integer genresCount = service.getGenresCount();
+	Integer borrowersCount = service.getBorrowersCount();
 	Integer numOfPages = 0;
-	if (genresCount % 10 > 0) {
-		numOfPages = genresCount / 10 + 1;
+	if (borrowersCount % 10 > 0) {
+		numOfPages = borrowersCount / 10 + 1;
 	} else {
-		numOfPages = genresCount / 10;
+		numOfPages = borrowersCount / 10;
 	}
-	List<Genre> genres = new ArrayList<>();
-	if (request.getAttribute("genres") != null) {
-		genres = (List<Genre>) request.getAttribute("genres");
+	List<Borrower> borrowers = new ArrayList<>();
+	if (request.getAttribute("borrowers") != null) {
+		borrowers = (List<Borrower>) request.getAttribute("borrowers");
 	} else {
-		genres = service.getAllGenres(1);
+		borrowers = service.getAllBorrowers(1);
 	}
 %>
 <script>
-	function searchGenres(pageNum){
+	function searchBorrowers(pageNum){
 		$.ajax({
-			url: "searchGenres",
+			url: "searchBorrowers",
 			dataType: "text json",
 			data:{
 				searchString: $('#searchString').val(),
@@ -34,7 +33,7 @@
 			}
 		}).done(function (data){
 			$("#paginateId").empty();
-			$('#genreTable').html(data.key1)
+			$('#borrowersTable').html(data.key1)
 		})
 		.fail(function(data) {
 		    alert('IT FAILED');
@@ -72,16 +71,16 @@
 			}
 		%>
 		<div class="page-header">
-			<h1>List of Genres in LMS</h1>
+			<h1>List of Borrowers in LMS</h1>
 		</div>
 		<button type="button" class="btn btn-success"
-			data-toggle="modal" data-target="#editGenreModal"
-			href="addgenre.jsp">Add New Genre</button><br/><br/>
+			data-toggle="modal" data-target="#editBorrowerModal"
+			href="addborrower.jsp">Add New Borrower</button><br/><br/>
 		<div class="input-group">
-			<form action="searchGenres">
+			<form action="searchBorrower">
 				<input type="text" class="form-control" name="searchString"
 					id="searchString" placeholder="Search for..."
-					oninput="searchGenres(1);">
+					oninput="searchBorrowers(1);">
 			</form>
 		</div>
 		<nav aria-label="Page navigation">
@@ -94,51 +93,62 @@
 				}
 				if(pageNo != 1) {
 			%>
-				<li><a href="pageGenres?pageNo=<%=pageNo-1 %>" aria-label="Previous" onclick="searchBooks(<%=pageNo-1 %>);"> <span
+				<li><a href="pageBorrowers?pageNo=<%=pageNo-1 %>" aria-label="Previous" onclick="searchBorrowers(<%=pageNo-1 %>);"> <span
 						aria-hidden="true">&laquo;</span>
 				</a></li>
 			<%} %>
 				<%
 					for (int i = 1; i <= numOfPages; i++) {
 				%>
-						<li><a href="pageGenres?pageNo=<%=i%>"><%=i%></a></li>
+						<li><a href="pageBorrowers?pageNo=<%=i%>"><%=i%></a></li>
 				<%
 					}
 				%>
 				<%
 				if(pageNo != numOfPages) {%>
-				<li><a href="pageGenres?pageNo=<%=pageNo+1 %>" aria-label="Next"> <span aria-hidden="true">&raquo;</span>
+				<li><a href="pageBorrowers?pageNo=<%=pageNo+1 %>" aria-label="Next"> <span aria-hidden="true">&raquo;</span>
 				</a></li>
 				<%} %>
 			</ul>
 		</nav>
-		<div class="col-md-8">
-			<table class="table table-striped" id="genreTable">
+		<div class="col-md-12">
+			<table class="table table-striped" id="borrowersTable">
 				<thead>
 					<tr>
 						<th>#</th>
-						<th>Genre Name</th>
-						<th>Genre ID</th>
+						<th>Borrower Name</th>
+						<th>Borrower Card Number</th>
+						<th>Borrower Address</th>
+						<th>Borrower Phone</th>
+						<th>Book Loans</th>
 						<th>Edit</th>
 						<th>Delete</th>
 					</tr>
 				</thead>
 				<tbody>
 					<%
-						for (Genre g : genres) {
-							String genreName = g.getGenreName();
-							Integer genreID = g.getGenreId();
-							String genreNameEnc = URLEncoder.encode(genreName, "UTF-8");
+						for (Borrower p : borrowers) {
+							String borrowerName = p.getBorrowerName();
+							String borrowerAddr = p.getBorrowerAddress();
+							String borrowerPhone = p.getBorrowerPhone();
+							Integer borrowerID = p.getBorrowerId();
+							String borrowerNameEnc = URLEncoder.encode(borrowerName, "UTF-8");
+							String borrowerAddrEnc = URLEncoder.encode(borrowerAddr, "UTF-8");
+							String borrowerPhoneEnc = URLEncoder.encode(borrowerPhone, "UTF-8");
+							
 					%>
 					<tr>
-						<td><%=genres.indexOf(g) + 1%></td>
-						<td><%=genreName%></td>
-						<td><%=genreID%></td>
+						<td><%=borrowers.indexOf(p) + 1%></td>
+						<td><%=borrowerName%></td>
+						<td><%=borrowerID%></td>
+						<td><%=borrowerAddr%></td>
+						<td><%=borrowerPhone%></td>
+						<td><a href='borrowerloan.jsp?borrowerId=<%=borrowerID%>' class='btn btn-info' style='color:white'>Loans</a></td>
 						<td><button type="button" class="btn btn-primary"
-								data-toggle="modal" data-target="#editGenreModal"
-								href="editgenre.jsp?genreId=<%=genreID%>&amp;genreName=<%=genreNameEnc%>">Update</button></td>
-						<td><form action="deleteGenre" method="post">
-							<input type="hidden" name="genreId" id="genreId" value="<%=genreID%>">
+								data-toggle="modal" data-target="#editBorrowerModal"
+								href="editborrower.jsp?borrowerId=<%=borrowerID%>&amp;borrowerName=<%=borrowerNameEnc%>&amp;borrowerAddr=<%=borrowerAddrEnc%>&amp;borrowerPhone=<%=borrowerPhoneEnc%>">Update</button></td>
+						<td><form action="deleteBorrower" method="post">
+							<input type="hidden" name="borrowerId" id="borrowerId" value="<%=borrowerID%>">
 							<button  class="btn btn-danger">Delete</button>
 							</form></td>
 					</tr>
@@ -150,7 +160,7 @@
 		</div>
 	</div>
 </div>
-<div class="modal fade" id="editGenreModal"
+<div class="modal fade" id="editBorrowerModal"
 	tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">....</div>

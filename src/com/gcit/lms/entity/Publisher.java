@@ -5,8 +5,10 @@ import java.util.List;
 
 public class Publisher implements Serializable{
 	
-	private static final long serialVersionUID = 9151170513668626160L;
-
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5148523848088702448L;
 	private Integer publisherId;
 	private String publisherName;
 	private String publisherAddress;

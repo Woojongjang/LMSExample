@@ -25,15 +25,15 @@
 <script>
 	function searchPublishers(pageNum){
 		$.ajax({
-			url: "searchBooks",
+			url: "searchPublishers",
 			dataType: "text json",
 			data:{
 				searchString: $('#searchString').val(),
-				pageNum: pageNum
+				pageNo: pageNum
 			}
 		}).done(function (data){
 			$("#paginateId").empty();
-			$('#booksTable').html(data.key1)
+			$('#publishersTable').html(data.key1)
 		})
 		.fail(function(data) {
 		    alert('IT FAILED');
@@ -71,16 +71,16 @@
 			}
 		%>
 		<div class="page-header">
-			<h1>List of Genres in LMS</h1>
+			<h1>List of Publishers in LMS</h1>
 		</div>
 		<button type="button" class="btn btn-success"
-			data-toggle="modal" data-target="#editGenreModal"
-			href="addgenre.jsp">Add New Genre</button><br/><br/>
+			data-toggle="modal" data-target="#editPublisherModal"
+			href="addpublisher.jsp">Add New Publisher</button><br/><br/>
 		<div class="input-group">
-			<form action="searchBooks">
+			<form action="searchPublishers">
 				<input type="text" class="form-control" name="searchString"
 					id="searchString" placeholder="Search for..."
-					oninput="searchGenres(1);">
+					oninput="searchPublishers(1);">
 			</form>
 		</div>
 		<nav aria-label="Page navigation">
@@ -93,50 +93,60 @@
 				}
 				if(pageNo != 1) {
 			%>
-				<li><a href="pageGenres?pageNo=<%=pageNo-1 %>" aria-label="Previous" onclick="searchBooks(<%=pageNo-1 %>);"> <span
+				<li><a href="pagePublishers?pageNo=<%=pageNo-1 %>" aria-label="Previous" onclick="searchPublishers(<%=pageNo-1 %>);"> <span
 						aria-hidden="true">&laquo;</span>
 				</a></li>
 			<%} %>
 				<%
 					for (int i = 1; i <= numOfPages; i++) {
 				%>
-						<li><a href="pageGenres?pageNo=<%=i%>"><%=i%></a></li>
+						<li><a href="pagePublishers?pageNo=<%=i%>"><%=i%></a></li>
 				<%
 					}
 				%>
 				<%
 				if(pageNo != numOfPages) {%>
-				<li><a href="pageGenres?pageNo=<%=pageNo+1 %>" aria-label="Next"> <span aria-hidden="true">&raquo;</span>
+				<li><a href="pagePublishers?pageNo=<%=pageNo+1 %>" aria-label="Next"> <span aria-hidden="true">&raquo;</span>
 				</a></li>
 				<%} %>
 			</ul>
 		</nav>
-		<div class="col-md-8">
-			<table class="table table-striped" id="booksTable">
+		<div class="col-md-12">
+			<table class="table table-striped" id="publishersTable">
 				<thead>
 					<tr>
 						<th>#</th>
-						<th>Genre Name</th>
-						<th>Genre ID</th>
+						<th>Publisher Name</th>
+						<th>Publisher ID</th>
+						<th>Publisher Address</th>
+						<th>Publisher Phone</th>
 						<th>Edit</th>
 						<th>Delete</th>
 					</tr>
 				</thead>
 				<tbody>
 					<%
-						for (Genre g : publishers) {
-							String genreName = g.getGenreName();
-							Integer genreID = g.getGenreId();
+						for (Publisher p : publishers) {
+							String publisherName = p.getPublisherName();
+							String publisherAddr = p.getPublisherAddress();
+							String publisherPhone = p.getPublisherPhone();
+							Integer publisherID = p.getPublisherId();
+							String publisherNameEnc = URLEncoder.encode(publisherName, "UTF-8");
+							String publisherAddrEnc = URLEncoder.encode(publisherAddr, "UTF-8");
+							String publisherPhoneEnc = URLEncoder.encode(publisherPhone, "UTF-8");
+							
 					%>
 					<tr>
-						<td><%=publishers.indexOf(g) + 1%></td>
-						<td><%=genreName%></td>
-						<td><%=genreID%></td>
+						<td><%=publishers.indexOf(p) + 1%></td>
+						<td><%=publisherName%></td>
+						<td><%=publisherID%></td>
+						<td><%=publisherAddr%></td>
+						<td><%=publisherPhone%></td>
 						<td><button type="button" class="btn btn-primary"
-								data-toggle="modal" data-target="#editGenreModal"
-								href="editgenre.jsp?genreId=<%=genreID%>&amp;genreName=<%=genreName%>">Update</button></td>
-						<td><form action="deleteGenre" method="post">
-							<input type="hidden" name="genreId" id="genreId" value="<%=genreID%>">
+								data-toggle="modal" data-target="#editPublisherModal"
+								href="editpublisher.jsp?publisherId=<%=publisherID%>&amp;publisherName=<%=publisherNameEnc%>&amp;publisherAddr=<%=publisherAddrEnc%>&amp;publisherPhone=<%=publisherPhoneEnc%>">Update</button></td>
+						<td><form action="deletePublisher" method="post">
+							<input type="hidden" name="publisherId" id="publisherId" value="<%=publisherID%>">
 							<button  class="btn btn-danger">Delete</button>
 							</form></td>
 					</tr>
@@ -148,7 +158,7 @@
 		</div>
 	</div>
 </div>
-<div class="modal fade" id="editGenreModal"
+<div class="modal fade" id="editPublisherModal"
 	tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">....</div>
