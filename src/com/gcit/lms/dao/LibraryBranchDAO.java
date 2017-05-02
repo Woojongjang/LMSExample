@@ -4,8 +4,10 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import com.gcit.lms.entity.Book;
 import com.gcit.lms.entity.LibraryBranch;
 /**
  * This is a DAO
@@ -48,6 +50,11 @@ public class LibraryBranchDAO extends BaseDAO{
 		return null;
 	}
 	
+	public List<Book> getBooksNotInBranch(Integer  branchId) throws ClassNotFoundException, SQLException{
+		BookDAO bdao = new BookDAO(conn);
+		return bdao.read("select * from tbl_book where bookId not in (select bookId from tbl_book_copies where branchId = ?)", new Object[]{branchId});
+	}
+	
 	public List<LibraryBranch> readBranchesByName(String  branchName) throws ClassNotFoundException, SQLException{
 		setPageSize(10);
 		branchName = "%"+branchName+"%";
@@ -67,11 +74,35 @@ public class LibraryBranchDAO extends BaseDAO{
 	public Integer getBranchesCount() throws ClassNotFoundException, SQLException{
 		return readCount("select count(*) as COUNT from tbl_library_branch", null);
 	}
+	
+	public Integer getBranchBookCount(LibraryBranch branch) throws ClassNotFoundException, SQLException{
+		return readCount("select count(*) as COUNT from tbl_book_copies where branchId = ?"
+				, new Object[]{branch.getBranchId()});
+	}
+	
+	public List<Book> readBranchBooksById(Integer branchId) {
+		List<Book> books = new ArrayList<>();
+		
+		return books;
+	}
 
+	public void updateBranchBooks(Integer bookId, Integer branchId, Integer count) throws ClassNotFoundException, SQLException{
+		save("update tbl_book_copies set noOfCopies = ? where bookId = ? and branchId = ?",
+				new Object[]{count, bookId, branchId});
+	}
+	
+	public void addBranchBooks(Integer bookId, Integer branchId, Integer count) throws ClassNotFoundException, SQLException{
+		save("insert into tbl_book_copies (bookId, branchId, noOfCopies) values (?,?,?)",
+				new Object[]{bookId, branchId, count});
+	}
+	
 	@Override
 	public List<LibraryBranch> extractData(ResultSet rs) throws SQLException, ClassNotFoundException {
-		//BookDAO bdao = new BookDAO(conn);
+		BookDAO bdao = new BookDAO(conn);
 		List<LibraryBranch> branches = new ArrayList<>();
+		HashMap<Book, Integer> booksCount = new HashMap<>();
+		Integer count;
+		Book book;
 		while(rs.next()){
 			LibraryBranch p = new LibraryBranch();
 			p.setBranchId(rs.getInt("branchId"));
@@ -95,7 +126,13 @@ public class LibraryBranchDAO extends BaseDAO{
 			else {
 				p.setBranchAddress(addr);
 			}
-			//a.setBooks(bdao.readFirstLevel("select * from tbl_book where bookId IN (Select bookId from tbl_book_branches where branchId = ?)", new Object[]{a.getBranchId()}));
+			//p.setBooks(bdao.readFirstLevel("select * from tbl_book where bookId IN (Select bookId from tbl_book_branches where branchId = ?)", new Object[]{a.getBranchId()}));
+			List<Book> books = bdao.readFirstLevel("select * from tbl_book tb inner join tbl_book_copies bc on tb.bookId = bc.bookId where bc.branchId = ?", new Object[]{p.getBranchId()});
+			for(Book b : books) {
+				count = readCount("select noOfCopies as COUNT from tbl_book_copies where branchId = ? and bookId = ?", new Object[]{p.getBranchId(),b.getBookId()});
+				booksCount.put(b, count);
+			}
+			p.setBooksCount(booksCount);
 			branches.add(p);
 		}
 		return branches;

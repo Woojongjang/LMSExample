@@ -1,3 +1,4 @@
+<%@page import="com.gcit.lms.service.BorrowerService"%>
 <%@include file="include.html"%>
 <%@page import="com.gcit.lms.entity.Borrower"%>
 <%@page import="java.util.ArrayList"%>
@@ -10,19 +11,31 @@
 //show view of all of borrower's loans
 	Integer userId = -3; //neither admin nor borrower if = -3. 0 is admin.
 	userId = (Integer) session.getAttribute("userId");
-	Integer borrowerId = null;
+	Integer borrowerId = 0;
 	if(userId == null) {
 		userId = -3; //user is error: no one?
 	}
 	if(userId == 0) { //user is admin
-		borrowerId = (Integer) request.getAttribute("borrowerId");//borrowerId
+		borrowerId = Integer.parseInt(request.getParameter("borrowerId"));
 	}
 	else { //user is someone else
-		borrowerId = userId;
+		if(userId > 0) {
+			borrowerId = userId;
+		}
+		else {
+			borrowerId = null; // user is probably a librarian (likely not)
+		}
 	}
-	
 	BookLoanService service = new BookLoanService();
-	Integer loanCount = service.getBookLoansCount();
+	BorrowerService brwServ = new BorrowerService();
+	String userName = "NO NAME";
+	Borrower borrower = new Borrower();
+	if(borrowerId!=null) {
+		borrower = brwServ.getBorrowerById(borrowerId);
+	}
+	userName = borrower.getBorrowerName();
+	
+	Integer loanCount = service.getBookLoansCount(borrowerId);
 	Integer numOfPages = 0;
 	if (loanCount % 10 > 0) {
 		numOfPages = loanCount / 10 + 1;
@@ -30,10 +43,6 @@
 		numOfPages = loanCount / 10;
 	}
 	List<BookLoan> loans = new ArrayList<>();
-	Borrower borrower = new Borrower();
-	if(userId!=0){
-		borrower.setBorrowerId(userId);
-	}
 	
 	if (request.getAttribute("borrowerloans") != null) {
 		loans = (List<BookLoan>) request.getAttribute("borrowerloans");
@@ -42,9 +51,9 @@
 	}
 %>
 <script>
-	function searchBookLoans(pageNum){
+	function searchBorrowerLoans(pageNum){
 		$.ajax({
-			url: "searchBookLoans",
+			url: "searchBorrowerLoans",
 			dataType: "text json",
 			data:{
 				searchString: $('#searchString').val(),
@@ -52,7 +61,7 @@
 			}
 		}).done(function (data){
 			$("#paginateId").empty();
-			$('#loansTable').html(data.key1)
+			$('#borrowerLoansTable').html(data.key1)
 		})
 		.fail(function(data) {
 		    alert('IT FAILED');
@@ -90,16 +99,15 @@
 			}
 		%>
 		<div class="page-header">
-			<h1>List of Book Loans in LMS</h1>
+			<h1>List of Book Loans for User: <%=userName %></h1>
 		</div>
-		<button type="button" class="btn btn-success"
-			data-toggle="modal" data-target="#editBwrBookLoanModal"
-			href="addbookloan.jsp">Add New Book Loan</button><br/><br/>
+		<a type="button" class="btn btn-success"
+			href="choosebranch.jsp">Borrow a New Book</a><br/><br/>
 		<div>
-			<form action="searchBookLoans">
+			<form action="searchBorrowerLoans">
 				<input type="text" class="form-control" name="searchString"
 					id="searchString" placeholder="Search for..."
-					oninput="searchBookLoans(1);">
+					oninput="searchBorrowerLoans(1);">
 			</form>
 		</div>
 	
@@ -113,26 +121,26 @@
 				}
 				if(pageNo != 1) {
 			%>
-				<li><a href="pageBookLoans?pageNo=<%=pageNo-1 %>" aria-label="Previous" onclick="searchBookLoans(<%=pageNo-1 %>);"> <span
+				<li><a href="pageBorrowerLoans?pageNo=<%=pageNo-1 %>&amp;borrowerId=<%=borrowerId %>" aria-label="Previous" onclick="searchBookLoans(<%=pageNo-1 %>);"> <span
 						aria-hidden="true">&laquo;</span>
 				</a></li>
 			<%} %>
 				<%
 					for (int i = 1; i <= numOfPages; i++) {
 				%>
-						<li><a href="pageBookLoans?pageNo=<%=i%>"><%=i%></a></li>
+						<li><a href="pageBorrowerLoans?pageNo=<%=i%>&amp;borrowerId=<%=borrowerId %>"><%=i%></a></li>
 				<%
 					}
 				%>
 				<%
 				if(pageNo != numOfPages) {%>
-				<li><a href="pageBookLoans?pageNo=<%=pageNo+1 %>" aria-label="Next"> <span aria-hidden="true">&raquo;</span>
+				<li><a href="pageBorrowerLoans?pageNo=<%=pageNo+1 %>&amp;borrowerId=<%=borrowerId %>" aria-label="Next"> <span aria-hidden="true">&raquo;</span>
 				</a></li>
 				<%} %>
 			</ul>
 		</nav>
 		<div>
-			<table class="table table-striped" id="loansTable">
+			<table class="table table-striped" id="borrowerLoansTable">
 				<thead>
 					<tr>
 						<th>#</th>
@@ -187,11 +195,14 @@
 						<td><%=dateDue%></td>
 						<td><%=dateIn%></td>
 						<%if(in == 0) {%>
-						<td><button type="button" class="btn btn-warning"
-								href="bookloanreturn.jsp?borrowerId=<%=borrowerID%>&amp;borrowerName=<%=borrowerNameEnc%>
-								&amp;branchId=<%=branchID%>&amp;branchName=<%=branchNameEnc%>
-								&amp;bookId=<%=bookID%>&amp;bookName=<%=bookNameEnc%>
-								&amp;dateOut=<%=dateOutEnc%>&amp;dateDue=<%=dateDueEnc%>&amp;dateIn=<%=dateInEnc%>">Return</button></td>
+						<td><form action="bookLoanReturn" method="post">
+							<input type="hidden" name="bookId" id="bookId" value="<%=bookID%>">
+							<input type="hidden" name="borrowerId" id="borrowerId" value="<%=borrowerID%>">
+							<input type="hidden" name="branchId" id="branchId" value="<%=branchID%>">
+							<input type="hidden" name="dateOut" id="dateOut" value="<%=dateOut%>">
+							<input type="hidden" name="dateIn" id="dateIn" value="<%=dateIn%>">
+							<button  class="btn btn-warning">Return</button>
+							</form></td>
 						<%} %>
 					</tr>
 					<%

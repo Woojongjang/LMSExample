@@ -20,11 +20,12 @@
 	%>	
 <div class='jumbotron'>
 	<h1>Borrower Services</h1>
+	<p>Welcome to GCIT Library Management System, User <%=session.getAttribute("userId") %></p>
 </div>
 <div class='row'>
 	<div class="panel panel-default">
 		<div class="panel-heading">
-		<a href="viewbranches.jsp" style="text-decoration: none">
+		<a href="choosebranch.jsp" style="text-decoration: none">
 			<h3 class="panel-title">Borrow A Book</h3>
 			</a>
 		</div>

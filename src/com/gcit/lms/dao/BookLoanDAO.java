@@ -68,15 +68,26 @@ public class BookLoanDAO extends BaseDAO{
 	}
 	
 	public void updateBookLoan(BookLoan book) throws ClassNotFoundException, SQLException{
-		Book bookId = book.getBook();
-		LibraryBranch branchId = book.getBranch();
-		Borrower borrowId = book.getBorrower();
+		Integer bookId = book.getBook().getBookId();
+		Integer branchId = book.getBranch().getBranchId();
+		Integer borrowId = book.getBorrower().getBorrowerId();
 		String dateChecked = book.getDateChecked();
 		
 		String dateDue = book.getDateDue();
 		String dateIn = book.getDateIn();
 		save("update tbl_book_loans set dueDate = ?, set dateIn = ? where bookId = ? and branchId = ? and cardNo = ? and dateOut = ?",
 				new Object[]{dateDue, dateIn, bookId, branchId, borrowId, dateChecked});
+	}
+	
+	public void returnBookLoan(BookLoan book) throws ClassNotFoundException, SQLException{
+		Integer bookId = book.getBook().getBookId();
+		Integer branchId = book.getBranch().getBranchId();
+		Integer borrowId = book.getBorrower().getBorrowerId();
+		String dateChecked = book.getDateChecked();
+		
+		String dateIn = book.getDateIn();
+		save("update tbl_book_loans set set dateIn = ? where bookId = ? and branchId = ? and cardNo = ? and dateOut = ?",
+				new Object[]{dateIn, bookId, branchId, borrowId, dateChecked});
 	}
 	
 	public void deleteBookLoan(BookLoan book) throws ClassNotFoundException, SQLException{
@@ -117,6 +128,10 @@ public class BookLoanDAO extends BaseDAO{
 
 	public Integer getBookLoansCount() throws ClassNotFoundException, SQLException{
 		return readCount("select count(*) as COUNT from tbl_book_loans", null);
+	}
+	
+	public Integer getBookLoansCount(Integer borrowerId) throws ClassNotFoundException, SQLException{
+		return readCount("select count(*) as COUNT from tbl_book_loans where cardNo = ?", new Object[]{borrowerId});
 	}
 	
 	@Override

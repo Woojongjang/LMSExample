@@ -26,6 +26,22 @@ public class BookLoanService {
 		return null;
 	}
 	
+	public Integer getBookLoansCount(Integer borrowerId) throws SQLException{
+		Connection conn = null;
+		try {
+			conn = ConnectionUtil.getConnection();
+			BookLoanDAO bldao = new BookLoanDAO(conn);
+			return bldao.getBookLoansCount(borrowerId);
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+		} finally{
+			if(conn!=null){
+				conn.close();
+			}
+		}
+		return null;
+	}
+	
 	public void addBookLoan(BookLoan loan) throws SQLException{
 		Connection conn = null;
 		try {

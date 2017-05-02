@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -26,7 +27,7 @@ import com.gcit.lms.service.BorrowerService;
 /**
  * Servlet implementation class BorrowerServlet
  */
-@WebServlet({"/BorrowerServlet", "/borrowLogin"})
+@WebServlet({"/BorrowerServlet", "/borrowLogin", "/bookLoanReturn", "/pageBorrowerLoans", "/chooseBranch"})
 public class BorrowerServlet extends HttpServlet {
 	private static final long serialVersionUID = 2888013528754996495L;
 
@@ -49,6 +50,10 @@ public class BorrowerServlet extends HttpServlet {
 			//System.out.println("inside BorrowerServlet:" +request.getRequestURI());
 			forwardPath = borrowerLogin(request); 
 			break;
+		case "/pageBorrowerLoans":
+			pageBorrowerLoans(request);
+			forwardPath = "/borrowerloan.jsp";
+			break;
 		default:
 			break;
 		}
@@ -62,7 +67,23 @@ public class BorrowerServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		doGet(request, response);
+		String reqUrl = request.getRequestURI().substring(request.getContextPath().length(), request.getRequestURI().length());
+		String forwardPath = "/welcome.jsp";
+		switch (reqUrl) {
+		case "/bookLoanReturn":
+			System.out.println("Returning a Book!");
+			bookLoanReturn(request);
+			forwardPath = "/borrowerloan.jsp";
+			break;
+		case "/chooseBranch":
+			chooseBranch(request);
+			forwardPath = "/viewlibrarybooks.jsp";
+			break;
+		default:
+			break;
+		}
+		RequestDispatcher rd = request.getRequestDispatcher(forwardPath);
+		rd.forward(request, response);
 	}
 	
 	private String borrowerLogin(HttpServletRequest request) {
@@ -75,8 +96,8 @@ public class BorrowerServlet extends HttpServlet {
 			loginCheck = service.checkBorrowerId(cardNo);
 			HttpSession session = request.getSession();
 			if(loginCheck) {
-				System.out.println("inside BorrowerServlet:SUCESS");
-				session.setAttribute("userId", request.getParameter("cardId"));
+				//System.out.println("inside BorrowerServlet:SUCESS");
+				session.setAttribute("userId", Integer.parseInt(request.getParameter("cardId")));
 				forwardPath = "/borrower.jsp";
 				request.setAttribute("message", "Login Successful");
 				return forwardPath;
@@ -144,17 +165,20 @@ public class BorrowerServlet extends HttpServlet {
 		}
 	}
 	
-	private void pageBookLoans(HttpServletRequest request) {
+	private void pageBorrowerLoans(HttpServletRequest request) {
 		Integer pageNo = Integer.parseInt(request.getParameter("pageNo"));
 		BookLoanService service = new BookLoanService();
+		Integer borrowerId = Integer.parseInt(request.getParameter("borrowerId"));
+		Borrower borrower = new Borrower();
+		borrower.setBorrowerId(borrowerId);
 		try {
-			request.setAttribute("borrowerloans", service.getAllBookLoans(pageNo));
+			request.setAttribute("borrowerloans", service.getUserBookLoans(pageNo, borrower));
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	private void editBookLoan(HttpServletRequest request) {
+	private void bookLoanReturn(HttpServletRequest request) {
 		BookLoan loan = new BookLoan();
 		//String borrowerName = (request.getParameter("borrowerName"));
 		Borrower borrower = new Borrower();
@@ -172,29 +196,22 @@ public class BorrowerServlet extends HttpServlet {
 		book.setBookId(bookId);
 		
 		String dateOut = (request.getParameter("dateOut"));
-		String dateDue = (request.getParameter("dateDue"));
-		String dateIn = (request.getParameter("dateIn"));
 		
-		if(dateOut.equals("NOT CHECKED OUT?")) {
-			dateOut = null;
-		}
-		if(dateDue.equals("NO DUE DATE")) {
-			dateDue = null;
-		}
-		if(dateIn.equals("NOT CHECKED IN")) {
-			dateIn = null;
-		}
+		SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss");
+		Date dateNow = new Date();
+		String now = ft.format(dateNow);
+		String dateIn = (now);
 		
 		loan.setBook(book);
 		loan.setBranch(branch);
 		loan.setBorrower(borrower);
 		loan.setDateChecked(dateOut);
-		loan.setDateDue(dateDue);
+		
 		loan.setDateIn(dateIn);
-		BookLoanService service = new BookLoanService();
+		BorrowerService service = new BorrowerService();
 		try {
-			service.editBookLoan(loan);
-			request.setAttribute("message", "Book Loan Edit Successful");
+			service.returnBookLoan(loan);
+			request.setAttribute("message", "Book Loan Return Successful");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -303,5 +320,14 @@ public class BorrowerServlet extends HttpServlet {
 		}
 		String jsonData = "{ \"key1\": \""+strBuf.toString()+"\", \"key2\": "+loanSize+" }";
 		return jsonData;
+	}
+	
+	private void chooseBranch(HttpServletRequest request) {
+		Integer chosenBranch;
+		String[] selectedBranches = request.getParameterValues("liblist");
+		if(selectedBranches!=null && selectedBranches.length!=0) {
+			chosenBranch = Integer.parseInt(selectedBranches[0]);
+			request.setAttribute("chosenBranch", chosenBranch);
+		}
 	}
 }

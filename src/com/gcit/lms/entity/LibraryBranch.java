@@ -1,6 +1,8 @@
 package com.gcit.lms.entity;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
 
 public class LibraryBranch implements Serializable{
 	
@@ -11,6 +13,8 @@ public class LibraryBranch implements Serializable{
 	private Integer branchId;
 	private String branchName;
 	private String branchAddress;
+	private HashMap<Book, Integer> booksCount;
+	
 	/**
 	 * @return the branchId
 	 */
@@ -46,6 +50,18 @@ public class LibraryBranch implements Serializable{
 	 */
 	public void setBranchAddress(String branchAddress) {
 		this.branchAddress = branchAddress;
+	}
+	/**
+	 * @return the booksCount
+	 */
+	public HashMap<Book, Integer> getBooksCount() {
+		return booksCount;
+	}
+	/**
+	 * @param booksCount the booksCount to set
+	 */
+	public void setBooksCount(HashMap<Book, Integer> booksCount) {
+		this.booksCount = booksCount;
 	}
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()

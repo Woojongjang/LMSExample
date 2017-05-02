@@ -176,15 +176,12 @@ public class BookLoanServlet extends HttpServlet {
 		String dateDue = (request.getParameter("dateDue"));
 		String dateIn = (request.getParameter("dateIn"));
 		
+		SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss");
+		
 		if(dateOut.equals("NOT CHECKED OUT?")) {
 			dateOut = null;
 		}
-		if(dateDue.equals("NO DUE DATE")) {
-			dateDue = null;
-		}
-		if(dateIn.equals("NOT CHECKED IN")) {
-			dateIn = null;
-		}
+		
 		
 		loan.setBook(book);
 		loan.setBranch(branch);
@@ -194,9 +191,25 @@ public class BookLoanServlet extends HttpServlet {
 		loan.setDateIn(dateIn);
 		BookLoanService service = new BookLoanService();
 		try {
+			if(dateDue.equals("NO DUE DATE")) {
+				dateDue = null;
+			}
+			else {
+				Date newDueDateFormatted = ft.parse("dateDue");
+				String newDateDue = ft.format(newDueDateFormatted);
+			}
+			if(dateIn.equals("NOT CHECKED IN")) {
+				dateIn = null;
+			}
+			else {
+				Date newDueDateFormatted = ft.parse("dateIn");
+				String newDateIn = ft.format(newDueDateFormatted);
+			}
 			service.editBookLoan(loan);
 			request.setAttribute("message", "Book Loan Edit Successful");
 		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (ParseException e) {
 			e.printStackTrace();
 		}
 	}

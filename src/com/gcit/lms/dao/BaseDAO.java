@@ -115,6 +115,13 @@ public abstract class BaseDAO {
 	public abstract List extractData(ResultSet rs) throws SQLException, ClassNotFoundException;
 	
 	public List readFirstLevel(String query, Object[] vals) throws ClassNotFoundException, SQLException{
+//		Integer index = 0;
+//		if(getPageSize()!=null) {
+//			if(getPageNo()!=null){
+//				index = (getPageNo()-1)*10;
+//			}
+//			query = query+" LIMIT "+index+", "+pageSize;
+//		}
 		PreparedStatement pstmt = conn.prepareStatement(query);
 		if(vals!=null){
 			int count = 1;

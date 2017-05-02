@@ -4,7 +4,7 @@
 <%@page import="com.gcit.lms.entity.LibraryBranch"%>
 <%@page import="com.gcit.lms.service.AdminService"%>
 
-<%session.setAttribute("userId", -1); %>
+
 <%
 	AdminService service = new AdminService();
 	Integer branchesCount = service.getBranchesCount();
@@ -22,9 +22,9 @@
 		<h1>Choose a Library</h1>
 	</div>
 	<div class="col-sm-4">
-		<form action="libChooseBranch" id="libbranchform" method="post">
+		<form action="chooseBranch" id="choosebranchform" method="post">
 			<label for="selectlib">Select A Library:</label>
-			<select class="form-control" name="liblist" form="libbranchform" id="selectlib">
+			<select class="form-control" name="liblist" form="choosebranchform" id="selectlib">
 			<%for(LibraryBranch lb: branches) { %>
 				<option value="<%=lb.getBranchId()%>"><%=lb.getBranchId()%>) <%=lb.getBranchName() %>, <%=lb.getBranchAddress() %></option>
 			<%} %>
