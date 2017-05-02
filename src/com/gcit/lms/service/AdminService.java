@@ -694,4 +694,38 @@ public class AdminService {
 		}
 		return null;
 	}
+	
+	public Integer getBranchSearchCount(String branchName) throws SQLException{
+		Connection conn = null;
+		try {
+			conn = ConnectionUtil.getConnection();
+			LibraryBranchDAO pdao = new LibraryBranchDAO(conn);
+			List<LibraryBranch> branchList = pdao.readBranchesByName(null, branchName);
+			return branchList.size();
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+		} finally{
+			if(conn!=null){
+				conn.close();
+			}
+		}
+		return null;
+	}
+	
+	public Integer getAuthorSearchCount(String authorName) throws SQLException{
+		Connection conn = null;
+		try {
+			conn = ConnectionUtil.getConnection();
+			AuthorDAO adao = new AuthorDAO(conn);
+			List<Author> authList = adao.readAuthorsByName(null, authorName);
+			return authList.size();
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+		} finally{
+			if(conn!=null){
+				conn.close();
+			}
+		}
+		return null;
+	}
 }

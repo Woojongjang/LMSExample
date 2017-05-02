@@ -267,18 +267,25 @@ public class AdminServlet extends HttpServlet {
 		String searchString = request.getParameter("searchString");
 		AdminService service = new AdminService();
 		StringBuffer strBuf = new StringBuffer();
+		StringBuffer strPagBuf = new StringBuffer();
 		Integer pageNo = 1;
 		Integer authorSize = 1;
+		Integer numOfPages = 0;
 		try {
 			// request.setAttribute("authors", service.getAuthorsByName(1,
 			// searchString));
 			//ADD LAST AUTHOR WITH COUNT AS ID IF THIS DOESNT WORK
-			String pageNum = request.getParameter("count");
+			String pageNum = request.getParameter("pageNo");
 			if(pageNum != null) {
 				pageNo = Integer.parseInt(pageNum);
 			}
 			List<Author> authors = service.getAuthorsByName(pageNo, searchString);
-			authorSize = authors.size();
+			authorSize = service.getAuthorSearchCount(searchString);
+			if (authorSize % 10 > 0) {
+				numOfPages = authorSize / 10 + 1;
+			} else {
+				numOfPages = authorSize / 10;
+			}
 			request.setAttribute("pageNo", authorSize);
 			strBuf.append("<thead><tr><th>#</th><th>Author Name</th><th>Author ID</th><th>Edit</th><th>Delete</th></tr></thead><tbody>");
 			for (Author a : authors) {
@@ -293,7 +300,42 @@ public class AdminServlet extends HttpServlet {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		String jsonData = "{ \"key1\": \""+strBuf.toString()+"\", \"key2\": "+authorSize+" }";
+//		String pageString = request.getParameter("pageNo");
+//		Integer pageNo = 1;
+//		if(pageString != null) {
+//			pageNo = Integer.parseInt(request.getParameter("pageNo"));
+//		}
+//		if(pageNo != 1) {
+//	%>
+//		<li><a href='pageAuthors?pageNo=<%=pageNo-1 %>' aria-label='Previous' onclick='searchAuthors(<%=pageNo-1 %>);'> <span aria-hidden='true'>&laquo;</span></a></li>
+//	<%} %>
+//		<%
+//			for (int i = 1; i <= numOfPages; i++) {
+//		%>
+//				<li><a href="pageAuthors?pageNo=<%=i%>"><%=i%></a></li>
+//		<%
+//			}
+//			//Integer nextPage = Integer.parseInt(request.getParameter("pageNo"));
+//			//String toPage = "";
+//			//if(nextPage < numOfPages) {
+//			//	toPage = request.getParameter("pageNo")+1;
+//			//}
+//		%>
+//		<%
+//		if(pageNo != numOfPages) {%>
+//		<li><a href="pageAuthors?pageNo=<%=pageNo+1 %>" aria-label="Next"> <span aria-hidden="true">&raquo;</span>
+//		</a></li>
+//		<%} %>
+		if(pageNo!=1) {
+			strPagBuf.append("<li><a href='#' aria-label='Previous' onclick='searchAuthors("+(pageNo-1)+");'> <span aria-hidden='true'>&laquo;</span></a></li>");
+		}
+		for(int i = 1; i <= numOfPages; i++) {
+			strPagBuf.append("<li><a href='#' onclick='searchAuthors("+i+");'>"+i+"</a></li>");
+		}
+		if(numOfPages!=pageNo){
+			strPagBuf.append("<li><a href='#' aria-label='Next'  onclick='searchAuthors("+(pageNo+1)+");'> <span aria-hidden='true'>&raquo;</span></a></li>");
+		}
+		String jsonData = "{ \"key1\": \""+strBuf.toString()+"\", \"key2\": \""+strPagBuf.toString()+"\" }";
 		return jsonData;
 	}
 	
@@ -805,7 +847,13 @@ public class AdminServlet extends HttpServlet {
 				pageNo = Integer.parseInt(pageNum);
 			}
 			List<LibraryBranch> branches = service.getBranchesByName(pageNo, searchString);
-			branchSize = branches.size();
+			branchSize = service.getBranchSearchCount(searchString);
+			Integer numOfPages = 0;
+			if (branchSize % 10 > 0) {
+				numOfPages = branchSize / 10 + 1;
+			} else {
+				numOfPages = branchSize / 10;
+			}
 			request.setAttribute("count", branchSize);
 			strBuf.append("<thead><tr><th>#</th><th>Branch Name</th><th>Branch Id</th>"
 					+"<th>Branch Address</th><th>Edit</th><th>Delete</th></tr></thead><tbody>");

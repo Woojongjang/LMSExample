@@ -80,9 +80,15 @@ public class LibraryBranchDAO extends BaseDAO{
 				, new Object[]{branch.getBranchId()});
 	}
 	
-	public List<Book> readBranchBooksById(Integer branchId) {
+	public List<Book> readBranchBooksById(Integer pageNo, String search, Integer branchId) throws ClassNotFoundException, SQLException {
 		List<Book> books = new ArrayList<>();
-		
+		BookDAO bdao = new BookDAO(conn);
+		bdao.setPageNo(pageNo);
+		bdao.setPageSize(10);
+//		select distinct b.bookId, b.title, b.pubId, bc.noOfCopies from tbl_book b inner join tbl_book_copies bc on bc.bookId = b.bookId
+//		where b.bookId like ? and b.title like ? and b.pubId like ? and b.bookId in 
+//		(select bookId from tbl_book where bookId in (select bookId from tbl_book_copies where branchId = ?));
+		books = bdao.read("select * from tbl_book where bookId in (select bookId from tbl_book_copies where branchId = ?)", new Object[]{branchId});
 		return books;
 	}
 

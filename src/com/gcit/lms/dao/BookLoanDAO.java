@@ -86,7 +86,7 @@ public class BookLoanDAO extends BaseDAO{
 		String dateChecked = book.getDateChecked();
 		
 		String dateIn = book.getDateIn();
-		save("update tbl_book_loans set set dateIn = ? where bookId = ? and branchId = ? and cardNo = ? and dateOut = ?",
+		save("update tbl_book_loans set dateIn = ? where bookId = ? and branchId = ? and cardNo = ? and dateOut = ?",
 				new Object[]{dateIn, bookId, branchId, borrowId, dateChecked});
 	}
 	

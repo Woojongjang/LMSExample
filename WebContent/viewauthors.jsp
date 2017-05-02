@@ -40,6 +40,7 @@
 			//$('#paginateId').//try data[] for string array
 			//alert('hello');
 			$("#paginateId").empty();
+			$("#paginateId").html(data.key2);
 			//var returnedData = JSON.parse(data);
 			//alert(returnedData.key2);
 			$('#authorsTable').html(data.key1);

@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
@@ -23,11 +24,13 @@ import com.gcit.lms.entity.Borrower;
 import com.gcit.lms.entity.LibraryBranch;
 import com.gcit.lms.service.BookLoanService;
 import com.gcit.lms.service.BorrowerService;
+import com.gcit.lms.service.LibrarianService;
 
 /**
  * Servlet implementation class BorrowerServlet
  */
-@WebServlet({"/BorrowerServlet", "/borrowLogin", "/bookLoanReturn", "/pageBorrowerLoans", "/chooseBranch"})
+@WebServlet({"/BorrowerServlet", "/borrowLogin", "/bookLoanReturn", "/pageBorrowerLoans", "/chooseBranch", "/borrowBook",
+				"/searchLibraryBooks"})
 public class BorrowerServlet extends HttpServlet {
 	private static final long serialVersionUID = 2888013528754996495L;
 
@@ -54,6 +57,15 @@ public class BorrowerServlet extends HttpServlet {
 			pageBorrowerLoans(request);
 			forwardPath = "/borrowerloan.jsp";
 			break;
+		case "/searchLibraryBooks":
+//			String lbData = searchLibraryBooks(request);
+//			response.setContentType("application/json");
+//		    response.setCharacterEncoding("UTF-8");
+//		    response.getWriter().write(lbData);
+//		    //System.out.println(aData);
+//			// forwardPath = "/viewauthors.jsp";
+//			isAjax = Boolean.TRUE;
+			break;
 		default:
 			break;
 		}
@@ -77,6 +89,10 @@ public class BorrowerServlet extends HttpServlet {
 			break;
 		case "/chooseBranch":
 			chooseBranch(request);
+			forwardPath = "/viewlibrarybooks.jsp";
+			break;
+		case "/borrowBook":
+			borrowBook(request);
 			forwardPath = "/viewlibrarybooks.jsp";
 			break;
 		default:
@@ -112,38 +128,22 @@ public class BorrowerServlet extends HttpServlet {
 		return forwardPath;
 	}
 	
-	private void addBookLoan(HttpServletRequest request) {
+	private void borrowBook(HttpServletRequest request) {
 		BookLoan loan = new BookLoan();
-		HttpSession session = request.getSession();
-		
 		
 		Borrower borrower = new Borrower();
 		//borrower.setBorrowerName(request.getParameter("borrowerName"));
-		if((Integer) session.getAttribute("userId") == 0){
-			String[] selectedBorrowers = request.getParameterValues("borrowerlist");
-			if(selectedBorrowers!=null && selectedBorrowers.length!=0) {
-				borrower.setBorrowerId(Integer.parseInt(selectedBorrowers[0]));
-			}
-		}
-		else {
-			borrower.setBorrowerId(Integer.parseInt("borrowerId"));
-		}
+		borrower.setBorrowerId(Integer.parseInt(request.getParameter("borrowerId")));
 		loan.setBorrower(borrower);
 		
 		LibraryBranch branch = new LibraryBranch();
 		//branch.setBranchName(request.getParameter("branchName");
-		String[] selectedBranch = request.getParameterValues("branchlist");
-		if(selectedBranch!=null && selectedBranch.length!=0) {
-			branch.setBranchId(Integer.parseInt(selectedBranch[0]));
-		}
+		branch.setBranchId(Integer.parseInt(request.getParameter("branchId")));
 		loan.setBranch(branch);
 		
 		Book book = new Book();
 		//book.setTitle(request.getParameter("bookName"));
-		String[] selectedBook = request.getParameterValues("booklist");
-		if(selectedBook!=null && selectedBook.length!=0) {
-			book.setBookId(Integer.parseInt(selectedBook[0]));
-		}
+		book.setBookId(Integer.parseInt(request.getParameter("bookId")));
 		loan.setBook(book);
 		
 		
@@ -253,71 +253,66 @@ public class BorrowerServlet extends HttpServlet {
 		}
 	}
 	
-	private String searchBookLoans(HttpServletRequest request) {
-		String searchString = request.getParameter("searchString");
-		BookLoanService service = new BookLoanService();
+	private String searchLibraryBooks(HttpServletRequest request) {
+//		String searchString = request.getParameter("searchString");
+//		LibrarianService service = new LibrarianService();
+//		Integer branchId = Integer.parseInt(request.getParameter("branchId"));
 		StringBuffer strBuf = new StringBuffer();
-		Integer pageNo = 1;
+//		LibraryBranch branch = new LibraryBranch();
+//		Integer pageNo = 1;
 		Integer loanSize = 1;
-		try {
-			// request.setAttribute("authors", service.getAuthorsByName(1,
-			// searchString));
-			//ADD LAST AUTHOR WITH COUNT AS ID IF THIS DOESNT WORK
-			String pageNum = request.getParameter("pageNo");
-			if(pageNum != null) {
-				pageNo = Integer.parseInt(pageNum);
-			}
-			List<BookLoan> loans = service.getBookLoanByName(pageNo, searchString);
-			loanSize = loans.size();
-			request.setAttribute("count", loanSize);
-			strBuf.append("<thead><tr><th>#</th><th>Borrower Name</th><th>Borrower ID</th><th>Branch Name</th>"
-					+"<th>Book Name</th><th>Checked OUT</th><th>Due Date</th><th>Checked IN</th>"
-					+ "<th>Edit</th><th>Delete</th></tr></thead><tbody>");
-			for (BookLoan bl : loans) {
-				String borrowerName = bl.getBorrower().getBorrowerName();
-				Integer borrowerID = bl.getBorrower().getBorrowerId();
-				String branchName = bl.getBranch().getBranchName();
-				Integer branchID = bl.getBranch().getBranchId();
-				String bookName = bl.getBook().getTitle();
-				Integer bookID = bl.getBook().getBookId();
-				String dateOut = bl.getDateChecked();
-				String dateDue = bl.getDateDue();
-				String dateIn = bl.getDateIn();
-				if(dateDue==null) {
-					dateDue = "NO DUE DATE";
-				}
-				if(dateIn==null) {
-					dateIn = "NOT CHECKED IN";
-				}
-				if(dateOut==null) {
-					dateOut = "NOT CHECKED OUT?";
-				}
-				String borrowerNameEnc = URLEncoder.encode(borrowerName, "UTF-8");
-				String branchNameEnc = URLEncoder.encode(branchName, "UTF-8");
-				String bookNameEnc = URLEncoder.encode(bookName, "UTF-8");
-				String dateOutEnc = URLEncoder.encode(dateOut, "UTF-8");
-				String dateDueEnc = URLEncoder.encode(dateDue, "UTF-8");
-				String dateInEnc = URLEncoder.encode(dateIn, "UTF-8");
-				strBuf.append("<tr><td>" + (loans.indexOf(bl) + 1) + "</td><td>" + borrowerName + "</td><td>"+borrowerID+"</td>"
-						+"<td>"+branchName+"</td><td>"+bookName+"</td><td>"+dateOut+"</td><td>"+dateDue+"</td><td>"+dateIn+"</td>");
-				strBuf.append("<td><a href='borrowerloan.jsp?borrowerId="+borrowerID+"' class='btn btn-info' style='color:white'>Loans</a></td>");
-				strBuf.append("<td><button type='button' class='btn btn-primary' data-toggle='modal' data-target='#editBookLoanModal' "
-				+"href='editbookloan.jsp?borrowerId="+borrowerID+"&amp;borrowerName="+borrowerNameEnc
-				+"&amp;branchId="+branchID+"&amp;branchName="+branchNameEnc+"&amp;bookId=<%=bookID%>"
-				+"&amp;bookName="+bookNameEnc+"&amp;dateOut="+dateOutEnc+"&amp;dateDue="+dateDueEnc+"&amp;dateIn="+dateInEnc+"'>Update</button></td>");
-				strBuf.append("<td><form action='deleteBorrower' method='post'><input type='hidden' name='bookId' id='bookId'"
-						+" value='"+bookID+"'><input type='hidden' name='borrowerId' id='borrowerId' value='"+borrowerID+"'>"
-						+"<input type='hidden' name='borrowerId' id='borrowerId' value='"+borrowerID+"'>"
-						+"<input type='hidden' name='branchId' id='branchId' value='"+branchID+"'>"
-						+"<input type='hidden' name='dateOut' id='dateOut' value='"+dateOut+"'>"
-						+"<button class='btn btn-danger'>Delete</button></form></td></tr>");
-			}	
-			strBuf.append("</tbody>");
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+//		HashMap<Book,Integer> bookCount = new HashMap<>();
+//		try {
+//			//branch = service.getBranchById(branchId);
+//			//bookCount = branch.getBooksCount();
+//			// request.setAttribute("authors", service.getAuthorsByName(1,
+//			// searchString));
+//			//ADD LAST AUTHOR WITH COUNT AS ID IF THIS DOESNT WORK
+//			String pageNum = request.getParameter("pageNo");
+//			if(pageNum != null) {
+//				pageNo = Integer.parseInt(pageNum);
+//			}
+//			bookCount = service.getLibraryBookSearch(pageNo, searchString, branchId);
+//			loanSize = loans.size();
+//			request.setAttribute("count", loanSize);
+//			strBuf.append("<thead><tr><th>#</th><th>Borrower Name</th><th>Borrower ID</th><th>Branch Name</th>"
+//					+"<th>Book Name</th><th>Checked OUT</th><th>Due Date</th><th>Checked IN</th>"
+//					+ "<th>Edit</th><th>Delete</th></tr></thead><tbody>");
+//			for (Map.Entry<Book, Integer> bc : bookCount.entrySet()) {
+//				Book book = bc.getKey();
+//				Integer count = bc.getValue();
+//				String bookName = book.getTitle();
+//				Integer bookId = book.getBookId();
+//				
+//				String branchNameEnc = URLEncoder.encode(branchName, "UTF-8");
+//				String branchAddrEnc = URLEncoder.encode(branchAddr, "UTF-8");
+//				String bookNameEnc = URLEncoder.encode(bookName, "UTF-8");
+//				
+//				<th>#</th>
+//				<th>Book Title</th>
+//				<th>Book ID</th>
+//				<th>Book Count</th>
+//				<th>Borrow Book</th>
+//				strBuf.append("<tr><td>" + (loans.indexOf(bl) + 1) + "</td><td>" + borrowerName + "</td><td>"+borrowerID+"</td>"
+//						+"<td>"+branchName+"</td><td>"+bookName+"</td><td>"+dateOut+"</td><td>"+dateDue+"</td><td>"+dateIn+"</td>");
+//				strBuf.append("<td><a href='borrowerloan.jsp?borrowerId="+borrowerID+"' class='btn btn-info' style='color:white'>Loans</a></td>");
+//				strBuf.append("<td><button type='button' class='btn btn-primary' data-toggle='modal' data-target='#editBookLoanModal' "
+//				+"href='editbookloan.jsp?borrowerId="+borrowerID+"&amp;borrowerName="+borrowerNameEnc
+//				+"&amp;branchId="+branchID+"&amp;branchName="+branchNameEnc+"&amp;bookId=<%=bookID%>"
+//				+"&amp;bookName="+bookNameEnc+"&amp;dateOut="+dateOutEnc+"&amp;dateDue="+dateDueEnc+"&amp;dateIn="+dateInEnc+"'>Update</button></td>");
+//				strBuf.append("<td><form action='deleteBorrower' method='post'><input type='hidden' name='bookId' id='bookId'"
+//						+" value='"+bookID+"'><input type='hidden' name='borrowerId' id='borrowerId' value='"+borrowerID+"'>"
+//						+"<input type='hidden' name='borrowerId' id='borrowerId' value='"+borrowerID+"'>"
+//						+"<input type='hidden' name='branchId' id='branchId' value='"+branchID+"'>"
+//						+"<input type='hidden' name='dateOut' id='dateOut' value='"+dateOut+"'>"
+//						+"<button class='btn btn-danger'>Delete</button></form></td></tr>");
+//			}	
+//			strBuf.append("</tbody>");
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		} catch (UnsupportedEncodingException e) {
+//			e.printStackTrace();
+//		}
 		String jsonData = "{ \"key1\": \""+strBuf.toString()+"\", \"key2\": "+loanSize+" }";
 		return jsonData;
 	}

@@ -2,6 +2,7 @@ package com.gcit.lms.service;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 
 import com.gcit.lms.dao.LibraryBranchDAO;
@@ -88,5 +89,22 @@ public class LibrarianService {
 				conn.close();
 			}
 		}
+	}
+	
+	public HashMap<Book,Integer> getLibraryBookSearch(Integer pageNoThenCount, String search, Integer branchId) throws SQLException{
+		Connection conn = null;
+		try {
+			conn = ConnectionUtil.getConnection();
+			LibraryBranchDAO pdao = new LibraryBranchDAO(conn);
+			List<LibraryBranch> branchList = pdao.readBranchesByName(pageNoThenCount, search);
+			return null;
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+		} finally{
+			if(conn!=null){
+				conn.close();
+			}
+		}
+		return null;
 	}
 }

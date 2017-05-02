@@ -59,13 +59,14 @@
 	}
 %>
 <script>
-	function searchBranches(pageNum){
+	function searchLibraryBooks(pageNum){
 		$.ajax({
-			url: "searchBranches",
+			url: "searchLibraryBooks",
 			dataType: "text json",
 			data:{
 				searchString: $('#searchString').val(),
-				pageNo: pageNum
+				pageNo: pageNum,
+				branchId : branchId
 			}
 		}).done(function (data){
 			$("#paginateId").empty();
@@ -116,7 +117,7 @@
 			<form action="searchBranches">
 				<input type="text" class="form-control" name="searchString"
 					id="searchString" placeholder="Search for..."
-					oninput="searchBranches(1);">
+					oninput="searchLibraryBooks(1);">
 			</form>
 		</div>
 		<nav aria-label="Page navigation">

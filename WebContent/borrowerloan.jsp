@@ -203,6 +203,9 @@
 							<input type="hidden" name="dateIn" id="dateIn" value="<%=dateIn%>">
 							<button  class="btn btn-warning">Return</button>
 							</form></td>
+						<%}
+						  else {%>
+						 <td style='color:threedlightshadow;'>BOOK RETURNED</td>
 						<%} %>
 					</tr>
 					<%
